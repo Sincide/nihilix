@@ -257,10 +257,7 @@ cat > "${SCRIPT_DIR}/hosts/${HOSTNAME}/variables.nix" << EOF
   config.var = {
     hostname = "${HOSTNAME}";
     username = "${USERNAME}";
-    configDirectory =
-      "/home/"
-      + config.var.username
-      + "/.config/nixos"; # The path of the nixos configuration directory
+    configDirectory = "${SCRIPT_DIR}"; # The path of the nixos configuration directory
 
     keyboardLayout = "${KEYBOARD}";
 
@@ -369,42 +366,85 @@ echo -e "${GREEN}✓ home.nix copied${NC}\n"
 echo -e "${BLUE}→ Registering host in flake.nix...${NC}"
 
 # Check if host already exists in flake.nix
-if grep -q "^      ${HOSTNAME} =" "${SCRIPT_DIR}/flake.nix" 2>/dev/null; then
+if grep -q "      ${HOSTNAME} = nixpkgs.lib.nixosSystem" "${SCRIPT_DIR}/flake.nix" 2>/dev/null; then
     echo -e "${YELLOW}Host '${HOSTNAME}' already exists in flake.nix, skipping...${NC}\n"
 else
-    # Create the new host entry
-    NEW_HOST_ENTRY="      ${HOSTNAME} = nixpkgs.lib.nixosSystem {
+    # Create temporary file with the new host entry
+    cat > "${SCRIPT_DIR}/flake.nix.tmp" << 'FLAKE_EOF'
+{
+  # https://github.com/anotherhadi/nixy
+  description = ''
+    Nixy simplifies and unifies the Hyprland ecosystem with a modular, easily customizable setup.
+    It provides a structured way to manage your system configuration and dotfiles with minimal effort.
+  '';
+
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.05";
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
+    hyprpanel.url = "github:Jas-SinghFSU/HyprPanel";
+    stylix.url = "github:danth/stylix";
+    apple-fonts.url = "github:Lyndeno/apple-fonts.nix";
+    nixcord.url = "github:kaylorben/nixcord";
+    sops-nix.url = "github:Mic92/sops-nix";
+    nixarr.url = "github:rasmus-kirk/nixarr";
+    nvf.url = "github:notashelf/nvf";
+    vicinae.url = "github:vicinaehq/vicinae";
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    spicetify-nix = {
+      url = "github:Gerg-L/spicetify-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    eleakxir.url = "github:anotherhadi/eleakxir";
+  };
+
+  outputs = inputs @ {nixpkgs, ...}: {
+    nixosConfigurations = {
+FLAKE_EOF
+
+    # Add all existing hosts from the original flake.nix
+    # Extract existing host configurations (everything between nixosConfigurations = { and the closing };)
+    awk '
+        /nixosConfigurations = \{/ { in_configs=1; next }
+        in_configs && /^    };$/ { exit }
+        in_configs { print }
+    ' "${SCRIPT_DIR}/flake.nix" >> "${SCRIPT_DIR}/flake.nix.tmp"
+
+    # Add the new host entry
+    cat >> "${SCRIPT_DIR}/flake.nix.tmp" << FLAKE_EOF
+      ${HOSTNAME} = nixpkgs.lib.nixosSystem {
         modules = [
           {
             nixpkgs.overlays = [];
             _module.args = {
               inherit inputs;
             };
-          }"
+          }
+FLAKE_EOF
 
     # Add nixos-hardware if NVIDIA is enabled
     if [[ "$ENABLE_NVIDIA" == "true" ]]; then
-        NEW_HOST_ENTRY="${NEW_HOST_ENTRY}
-          # inputs.nixos-hardware.nixosModules.YOUR-HARDWARE-MODULE  # Optional: add your specific hardware module"
+        cat >> "${SCRIPT_DIR}/flake.nix.tmp" << 'FLAKE_EOF'
+          # inputs.nixos-hardware.nixosModules.YOUR-HARDWARE-MODULE  # Optional: add your specific hardware module
+FLAKE_EOF
     fi
 
-    NEW_HOST_ENTRY="${NEW_HOST_ENTRY}
+    cat >> "${SCRIPT_DIR}/flake.nix.tmp" << FLAKE_EOF
           inputs.home-manager.nixosModules.home-manager
           inputs.stylix.nixosModules.stylix
           ./hosts/${HOSTNAME}/configuration.nix
         ];
-      };"
+      };
+    };
+  };
+}
+FLAKE_EOF
 
-    # Insert before the closing braces of nixosConfigurations
-    # Using awk to insert before the last };
-    awk -v new_entry="$NEW_HOST_ENTRY" '
-        /^    };$/ && !done {
-            print new_entry
-            done=1
-        }
-        {print}
-    ' "${SCRIPT_DIR}/flake.nix" > "${SCRIPT_DIR}/flake.nix.tmp"
-
+    # Replace the old flake.nix with the new one
     mv "${SCRIPT_DIR}/flake.nix.tmp" "${SCRIPT_DIR}/flake.nix"
     echo -e "${GREEN}✓ Host registered in flake.nix${NC}\n"
 fi
