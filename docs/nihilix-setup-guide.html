@@ -205,7 +205,9 @@
         <summary><code>configuration.nix</code></summary>
         <p>
           Declares which system modules to use. For the desktop setup we removed
-          laptop-specific files (NVIDIA, Omen). The hardware file and
+          laptop-specific files (NVIDIA, Omen) and swapped in the GRUB bootloader
+          module (<code>nixos/grub.nix</code>) so it works with the graphical
+          installer defaults. The hardware file and
           <code>variables.nix</code> are always imported last.
         </p>
       </details>
@@ -316,6 +318,11 @@
           <strong>Display issues</strong>: Fine-tune the
           <code>monitor</code> entries in
           <code>home/system/hyprland/default.nix</code>.
+          </li>
+          <li>
+          <strong>Bootloader errors</strong>: Make sure the correct boot module is imported
+          (GRUB for BIOS/graphical installer, systemd-boot for EFI) and that
+          your EFI partition is mounted at rebuild time.
         </li>
         <li>
           <strong>Audio problems</strong>: Check <code>nixos/audio.nix</code>, which

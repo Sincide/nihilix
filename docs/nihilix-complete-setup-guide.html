@@ -508,7 +508,7 @@
             <li><strong>Virtualization:</strong> QEMU/KVM, VirtualBox, or VMware</li>
             <li><strong>RAM:</strong> At least 4GB allocated to VM (8GB recommended)</li>
             <li><strong>Storage:</strong> 20GB minimum (40GB recommended)</li>
-            <li><strong>NixOS ISO:</strong> Latest NixOS minimal or graphical ISO from <a href="https://nixos.org/download.html" target="_blank">nixos.org</a></li>
+            <li><strong>NixOS ISO:</strong> Latest NixOS GNOME graphical ISO from <a href="https://nixos.org/download.html" target="_blank">nixos.org</a> (we'll use the graphical installer with "No Desktop" option)</li>
         </ul>
 
         <h3>For Real Hardware Installation</h3>
@@ -557,9 +557,18 @@ sudo apt install qemu-kvm virt-manager
 # On Fedora
 sudo dnf install @virtualization</code></pre>
 
-            <p><span class="step-number">1.2</span> Download NixOS ISO:</p>
+            <p><span class="step-number">1.2</span> Download NixOS Graphical ISO:</p>
             <pre><code>cd ~/Downloads
-wget https://channels.nixos.org/nixos-unstable/latest-nixos-minimal-x86_64-linux.iso</code></pre>
+# Download the GNOME graphical ISO (easier for installation)
+wget https://channels.nixos.org/nixos-unstable/latest-nixos-gnome-x86_64-linux.iso</code></pre>
+
+            <div class="info-box">
+                <h4>💡 Why Graphical ISO?</h4>
+                <p>
+                    The graphical ISO includes a user-friendly installer that handles partitioning, formatting, and basic
+                    configuration automatically. We'll select "No Desktop" during installation, then install Nihilix afterward.
+                </p>
+            </div>
 
             <p><span class="step-number">1.3</span> Create VM using virt-manager:</p>
             <ol>
@@ -579,7 +588,7 @@ wget https://channels.nixos.org/nixos-unstable/latest-nixos-minimal-x86_64-linux
         <div class="command-section">
             <ol>
                 <li>Download and install <a href="https://www.virtualbox.org/" target="_blank">VirtualBox</a></li>
-                <li>Download NixOS ISO from <a href="https://nixos.org/download.html" target="_blank">nixos.org</a></li>
+                <li>Download NixOS GNOME graphical ISO from <a href="https://nixos.org/download.html" target="_blank">nixos.org</a></li>
                 <li>Create new VM:
                     <ul>
                         <li>Type: Linux</li>
@@ -599,106 +608,172 @@ wget https://channels.nixos.org/nixos-unstable/latest-nixos-minimal-x86_64-linux
             </ol>
         </div>
 
-        <h3>Step 2: Install Base NixOS</h3>
-        <div class="info-box">
-            <h4>💡 Installation Strategy</h4>
+        <h3>Step 2: Install Base NixOS Using Graphical Installer</h3>
+        <div class="info-box success">
+            <h4>✨ Easy Installation with GUI</h4>
             <p>
-                We'll install a minimal NixOS system first, then clone Nihilix and rebuild. This is the safest approach.
+                We'll use the NixOS graphical installer which handles partitioning, formatting, and basic configuration
+                automatically. Select <strong>"No Desktop"</strong> option - we'll install Hyprland through Nihilix afterward.
             </p>
         </div>
 
         <div class="command-section">
-            <p><span class="step-number">2.1</span> Boot into the NixOS installer and become root:</p>
-            <pre><code>sudo -i</code></pre>
+            <p><span class="step-number">2.1</span> Boot into the NixOS graphical ISO:</p>
+            <p>The VM will boot into GNOME desktop. You'll see the NixOS installer icon on the desktop or in the application menu.</p>
 
-            <p><span class="step-number">2.2</span> Partition the disk (using UEFI/GPT):</p>
-            <pre><code># List available disks
-lsblk
+            <p><span class="step-number">2.2</span> Click on the "Install NixOS" icon to launch the graphical installer.</p>
 
-# Create partitions (assuming /dev/vda or /dev/sda)
-parted /dev/vda -- mklabel gpt
-parted /dev/vda -- mkpart ESP fat32 1MiB 512MiB
-parted /dev/vda -- set 1 esp on
-parted /dev/vda -- mkpart primary 512MiB 100%</code></pre>
+            <p><span class="step-number">2.3</span> Follow the installer wizard:</p>
 
-            <p><span class="step-number">2.3</span> Format the partitions:</p>
-            <pre><code># Format boot partition
-mkfs.fat -F 32 -n boot /dev/vda1
+            <ol style="margin-left: 40px;">
+                <li><strong>Welcome:</strong> Select your language → Click Next</li>
+                <li><strong>Location:</strong> Select your timezone (e.g., Europe/Stockholm) → Click Next</li>
+                <li><strong>Keyboard:</strong> Select your keyboard layout (e.g., Swedish) → Click Next</li>
+                <li><strong>Partitions:</strong>
+                    <ul>
+                        <li>Select "Erase disk" (for VM - this is safe)</li>
+                        <li>Choose your virtual disk (/dev/vda or /dev/sda)</li>
+                        <li>The installer will automatically create:
+                            <ul>
+                                <li>512MB EFI boot partition</li>
+                                <li>Rest of disk for root partition (ext4)</li>
+                            </ul>
+                        </li>
+                        <li>Click Next</li>
+                    </ul>
+                </li>
+                <li><strong>Users:</strong>
+                    <ul>
+                        <li>Set your name (e.g., Martin)</li>
+                        <li>Set username (e.g., martin)</li>
+                        <li>Set password</li>
+                        <li>Check "Use the same password for administrator"</li>
+                        <li>Click Next</li>
+                    </ul>
+                </li>
+                <li><strong>Desktop:</strong>
+                    <ul>
+                        <li><strong>⚠️ IMPORTANT: Select "No desktop"</strong></li>
+                        <li>We'll install Hyprland via Nihilix configuration</li>
+                        <li>Click Next</li>
+                    </ul>
+                </li>
+                <li><strong>Summary:</strong> Review settings → Click Install</li>
+            </ol>
 
-# Format root partition
-mkfs.ext4 -L nixos /dev/vda2</code></pre>
+            <p><span class="step-number">2.4</span> Wait for installation (5-15 minutes):</p>
+            <p>The installer will automatically:</p>
+            <ul>
+                <li>Partition and format the disk</li>
+                <li>Install base NixOS system</li>
+                <li>Configure bootloader</li>
+                <li>Set up users and basic settings</li>
+            </ul>
 
-            <p><span class="step-number">2.4</span> Mount the partitions:</p>
-            <pre><code>mount /dev/disk/by-label/nixos /mnt
-mkdir -p /mnt/boot
-mount /dev/disk/by-label/boot /mnt/boot</code></pre>
+            <p><span class="step-number">2.5</span> After installation completes:</p>
+            <pre><code># Uncheck "Restart now"
+# Click Done
+# Shutdown the VM
+# In VM settings, remove the ISO from the CD/DVD drive
+# Start the VM again</code></pre>
 
-            <p><span class="step-number">2.5</span> Generate initial configuration:</p>
-            <pre><code>nixos-generate-config --root /mnt</code></pre>
-
-            <p><span class="step-number">2.6</span> Edit configuration for basic system:</p>
-            <pre><code>nano /mnt/etc/nixos/configuration.nix</code></pre>
-
-            <p>Add these essential settings:</p>
-            <pre><code>{ config, pkgs, ... }:
-
-{
-  imports = [ ./hardware-configuration.nix ];
-
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-
-  networking.hostName = "nixos-test";
-  networking.networkmanager.enable = true;
-
-  time.timeZone = "Europe/Stockholm";  # Change to your timezone
-
-  users.users.martin = {  # Change 'martin' to your username
-    isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" ];
-    initialPassword = "password";  # Change after first login!
-  };
-
-  environment.systemPackages = with pkgs; [
-    vim
-    wget
-    git
-    curl
-  ];
-
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
-  system.stateVersion = "24.05";
-}</code></pre>
-
-            <p><span class="step-number">2.7</span> Install the system:</p>
-            <pre><code>nixos-install
-
-# Set root password when prompted
-# Then reboot
-reboot</code></pre>
+            <div class="info-box">
+                <h4>📝 Note</h4>
+                <p>
+                    The graphical installer (Calamares) handles partitioning, bootloader, and basic system setup automatically.
+                    It generates a traditional configuration.nix with mutable channels (not flakes). Don't worry - Nihilix
+                    will automatically enable flakes and switch to a reproducible configuration when you rebuild.
+                </p>
+            </div>
         </div>
 
         <h3>Step 3: Clone and Configure Nihilix</h3>
-        <div class="command-section">
-            <p><span class="step-number">3.1</span> After reboot, login with your user and get the system hostname:</p>
-            <pre><code>hostname
-# Should show: nixos-test</code></pre>
 
-            <p><span class="step-number">3.2</span> Fork and clone Nihilix:</p>
+        <div class="info-box success">
+            <h4>✨ Two Installation Methods Available!</h4>
+            <p>
+                You can choose between <strong>automated</strong> (recommended) or <strong>manual</strong> configuration.
+                The automated script handles everything with interactive prompts.
+            </p>
+        </div>
+
+        <h4>Method A: Automated Installation (Recommended)</h4>
+        <div class="command-section">
+            <p><span class="step-number">3A.1</span> After reboot, login with your user</p>
+
+            <p><span class="step-number">3A.2</span> Fork and clone Nihilix:</p>
             <pre><code># First, fork the repo on GitHub to your account
 # Then clone YOUR fork (not the original)
 git clone https://github.com/YOUR-USERNAME/nihilix ~/.config/nixos
 cd ~/.config/nixos</code></pre>
 
-            <p><span class="step-number">3.3</span> Create your host configuration:</p>
+            <p><span class="step-number">3A.3</span> Run the automated installation script:</p>
+            <pre><code>./install.sh</code></pre>
+
+            <p>The script will ask you for:</p>
+            <ul>
+                <li>Hostname (auto-detected)</li>
+                <li>Username (auto-detected)</li>
+                <li>Timezone and location</li>
+                <li>Keyboard layout</li>
+                <li>Locales</li>
+                <li>Git configuration</li>
+                <li>Theme preference (Catppuccin or Nixy)</li>
+                <li>Optional modules (NVIDIA, Docker, Tailscale, Bluetooth)</li>
+            </ul>
+
+            <p>Then it will automatically:</p>
+            <ul>
+                <li>Create your host configuration</li>
+                <li>Generate hardware configuration</li>
+                <li>Update all necessary files</li>
+                <li>Add everything to git</li>
+                <li>Build and apply the configuration</li>
+            </ul>
+
+            <div class="info-box success">
+                <h4>✨ That's it!</h4>
+                <p>
+                    The automated script handles everything. Just answer the questions, wait for the build to complete
+                    (20-40 minutes), and reboot into your new Hyprland system!
+                </p>
+            </div>
+
+            <p><span class="step-number">3A.4</span> Reboot when prompted:</p>
+            <pre><code>reboot</code></pre>
+        </div>
+
+        <h4>Method B: Manual Installation</h4>
+        <div class="command-section">
+            <p>If you prefer more control, follow these manual steps:</p>
+
+            <p><span class="step-number">3B.1</span> After reboot, login with your user and get the system hostname:</p>
+            <pre><code>hostname
+# Should show: nixos-test</code></pre>
+
+            <div class="info-box success">
+                <h4>✨ Flakes Enabled Automatically!</h4>
+                <p>
+                    You don't need to manually enable flakes. Nihilix includes a <code>nixos/nix.nix</code> module that
+                    automatically enables <code>experimental-features = ["nix-command" "flakes"]</code> when you rebuild.
+                    The graphical installer's traditional configuration will be replaced by Nihilix's flake-based setup.
+                </p>
+            </div>
+
+            <p><span class="step-number">3B.2</span> Fork and clone Nihilix:</p>
+            <pre><code># First, fork the repo on GitHub to your account
+# Then clone YOUR fork (not the original)
+git clone https://github.com/YOUR-USERNAME/nihilix ~/.config/nixos
+cd ~/.config/nixos</code></pre>
+
+            <p><span class="step-number">3B.3</span> Create your host configuration:</p>
             <pre><code># Copy the nihilix host as a template
 cp -r hosts/nihilix hosts/nixos-test
 
 # Copy the hardware configuration from the installer
 sudo cp /etc/nixos/hardware-configuration.nix hosts/nixos-test/</code></pre>
 
-            <p><span class="step-number">3.4</span> Edit your host variables:</p>
+            <p><span class="step-number">3B.4</span> Edit your host variables:</p>
             <pre><code>nano hosts/nixos-test/variables.nix</code></pre>
 
             <p>Update these values:</p>
@@ -740,7 +815,7 @@ sudo cp /etc/nixos/hardware-configuration.nix hosts/nixos-test/</code></pre>
   };
 }</code></pre>
 
-            <p><span class="step-number">3.5</span> Register your host in flake.nix:</p>
+            <p><span class="step-number">3B.5</span> Register your host in flake.nix:</p>
             <pre><code>nano flake.nix</code></pre>
 
             <p>Add your host configuration:</p>
@@ -764,7 +839,7 @@ sudo cp /etc/nixos/hardware-configuration.nix hosts/nixos-test/</code></pre>
   };
 };</code></pre>
 
-            <p><span class="step-number">3.6</span> Review and optionally disable modules you don't need:</p>
+            <p><span class="step-number">3B.6</span> Review and optionally disable modules you don't need:</p>
             <pre><code>nano hosts/nixos-test/configuration.nix</code></pre>
 
             <p>Comment out modules you don't want (e.g., NVIDIA, Docker, Tailscale):</p>
@@ -787,10 +862,10 @@ sudo cp /etc/nixos/hardware-configuration.nix hosts/nixos-test/</code></pre>
   ./variables.nix
 ];</code></pre>
 
-            <p><span class="step-number">3.7</span> Add all files to git (required for flakes):</p>
+            <p><span class="step-number">3B.7</span> Add all files to git (required for flakes):</p>
             <pre><code>git add .</code></pre>
 
-            <p><span class="step-number">3.8</span> Build and switch to Nihilix configuration:</p>
+            <p><span class="step-number">3B.8</span> Build and switch to Nihilix configuration:</p>
             <pre><code>sudo nixos-rebuild switch --flake ~/.config/nixos#nixos-test</code></pre>
 
             <div class="info-box warning">
@@ -801,7 +876,7 @@ sudo cp /etc/nixos/hardware-configuration.nix hosts/nixos-test/</code></pre>
                 </p>
             </div>
 
-            <p><span class="step-number">3.9</span> Reboot to start Hyprland:</p>
+            <p><span class="step-number">3B.9</span> Reboot to start Hyprland:</p>
             <pre><code>reboot</code></pre>
         </div>
 
@@ -852,8 +927,8 @@ sudo cp /etc/nixos/hardware-configuration.nix hosts/nixos-test/</code></pre>
 
         <h3>Step 1: Prepare Installation Media</h3>
         <div class="command-section">
-            <p><span class="step-number">1.1</span> Download the NixOS ISO:</p>
-            <pre><code>wget https://channels.nixos.org/nixos-unstable/latest-nixos-minimal-x86_64-linux.iso</code></pre>
+            <p><span class="step-number">1.1</span> Download the NixOS Graphical ISO:</p>
+            <pre><code>wget https://channels.nixos.org/nixos-unstable/latest-nixos-gnome-x86_64-linux.iso</code></pre>
 
             <p><span class="step-number">1.2</span> Create bootable USB (Linux):</p>
             <pre><code># Find your USB device (be VERY careful here!)
@@ -861,12 +936,20 @@ lsblk
 
 # Write ISO to USB (replace /dev/sdX with your USB device)
 # WARNING: This will ERASE all data on the USB!
-sudo dd if=latest-nixos-minimal-x86_64-linux.iso of=/dev/sdX bs=4M status=progress oflag=sync</code></pre>
+sudo dd if=latest-nixos-gnome-x86_64-linux.iso of=/dev/sdX bs=4M status=progress oflag=sync</code></pre>
 
             <p>On Windows, use <a href="https://rufus.ie/" target="_blank">Rufus</a> or <a href="https://www.balena.io/etcher/" target="_blank">Balena Etcher</a>.</p>
+
+            <div class="info-box">
+                <h4>💡 Using Graphical ISO</h4>
+                <p>
+                    We're using the GNOME graphical ISO for easier installation with the GUI installer. You'll select
+                    "No Desktop" during installation to keep the system minimal before installing Nihilix.
+                </p>
+            </div>
         </div>
 
-        <h3>Step 2: Boot and Partition</h3>
+        <h3>Step 2: Boot and Install Using Graphical Installer</h3>
         <div class="command-section">
             <p><span class="step-number">2.1</span> Boot from the USB:</p>
             <ul>
@@ -877,135 +960,174 @@ sudo dd if=latest-nixos-minimal-x86_64-linux.iso of=/dev/sdX bs=4M status=progre
                 <li>Save and restart</li>
             </ul>
 
-            <p><span class="step-number">2.2</span> Connect to internet:</p>
-            <pre><code># For WiFi
-sudo systemctl start wpa_supplicant
-wpa_cli
+            <p><span class="step-number">2.2</span> Wait for GNOME desktop to load:</p>
+            <p>The system will boot into a live GNOME environment. Wait for it to fully load.</p>
 
-# In wpa_cli:
-> add_network
-0
-> set_network 0 ssid "YourWiFiName"
-> set_network 0 psk "YourWiFiPassword"
-> enable_network 0
-> quit
+            <p><span class="step-number">2.3</span> Connect to internet (if using WiFi):</p>
+            <ul>
+                <li>Click the system menu in top-right corner</li>
+                <li>Select your WiFi network</li>
+                <li>Enter password</li>
+                <li>Wait for connection</li>
+            </ul>
 
-# Test connection
-ping -c 3 nixos.org</code></pre>
-
-            <p><span class="step-number">2.3</span> Become root and identify your disk:</p>
-            <pre><code>sudo -i
-lsblk  # Carefully note which disk is your target (e.g., /dev/nvme0n1, /dev/sda)</code></pre>
+            <p><span class="step-number">2.4</span> Launch the NixOS Installer:</p>
+            <p>Click on the "Install NixOS" icon on the desktop or find it in the application menu.</p>
 
             <div class="info-box danger">
-                <h4>⚠️ Double-Check Your Disk!</h4>
+                <h4>🚨 CRITICAL: Back Up Your Data!</h4>
                 <p>
-                    Make absolutely sure you're working with the correct disk. The next commands will PERMANENTLY ERASE
-                    all data on the specified disk. There is NO undo!
+                    The following steps will PERMANENTLY ERASE data on the selected disk. Make absolutely sure you have
+                    backups of all important data before proceeding!
                 </p>
             </div>
 
-            <p><span class="step-number">2.4</span> Partition the disk (UEFI/GPT recommended):</p>
-            <pre><code># Replace /dev/nvme0n1 with your actual disk
-DISK=/dev/nvme0n1  # or /dev/sda for SATA drives
+            <p><span class="step-number">2.5</span> Follow the installer wizard carefully:</p>
 
-# Create GPT partition table
-parted $DISK -- mklabel gpt
+            <ol style="margin-left: 40px;">
+                <li><strong>Welcome:</strong> Select your language → Click Next</li>
 
-# Create EFI System Partition (512MB)
-parted $DISK -- mkpart ESP fat32 1MiB 512MiB
-parted $DISK -- set 1 esp on
+                <li><strong>Location:</strong> Select your timezone (e.g., Europe/Stockholm) → Click Next</li>
 
-# Create root partition (rest of disk)
-parted $DISK -- mkpart primary 512MiB 100%
+                <li><strong>Keyboard:</strong> Select your keyboard layout (e.g., Swedish, US, German, etc.) → Click Next</li>
 
-# Verify partitions
-parted $DISK -- print</code></pre>
+                <li><strong>Partitions:</strong>
+                    <div class="info-box warning" style="margin: 10px 0;">
+                        <h4>⚠️ Partition Selection - CRITICAL STEP</h4>
+                        <p>CAREFULLY verify you're selecting the correct disk!</p>
+                    </div>
+                    <ul>
+                        <li><strong>Check disk identifier:</strong> Look at size and model to verify it's your target disk</li>
+                        <li>Common disk identifiers:
+                            <ul>
+                                <li><code>/dev/nvme0n1</code> - NVMe SSD</li>
+                                <li><code>/dev/sda</code> - SATA drive</li>
+                            </ul>
+                        </li>
+                        <li>Select <strong>"Erase disk"</strong></li>
+                        <li>The installer will automatically create:
+                            <ul>
+                                <li>512MB EFI boot partition</li>
+                                <li>Rest of disk for root partition (ext4)</li>
+                            </ul>
+                        </li>
+                        <li><strong>Optional:</strong> If you want swap, select "Swap (with Hibernate)" option</li>
+                        <li>Click Next</li>
+                    </ul>
+                </li>
 
-            <p><span class="step-number">2.5</span> Format partitions:</p>
-            <pre><code># Format boot partition
-mkfs.fat -F 32 -n boot ${DISK}p1  # Use ${DISK}1 for SATA (e.g., /dev/sda1)
+                <li><strong>Users:</strong>
+                    <ul>
+                        <li>Set your full name (e.g., Martin)</li>
+                        <li>Set username (e.g., martin) - <strong>remember this for Nihilix config!</strong></li>
+                        <li>Set a strong password</li>
+                        <li>Check "Use the same password for administrator"</li>
+                        <li>Click Next</li>
+                    </ul>
+                </li>
 
-# Format root partition
-mkfs.ext4 -L nixos ${DISK}p2      # Use ${DISK}2 for SATA</code></pre>
+                <li><strong>Desktop:</strong>
+                    <ul>
+                        <li><strong>🔴 CRITICAL: Select "No desktop"</strong></li>
+                        <li>Do NOT select GNOME, KDE, or any other desktop</li>
+                        <li>We will install Hyprland through Nihilix</li>
+                        <li>Click Next</li>
+                    </ul>
+                </li>
 
-            <p><span class="step-number">2.6</span> Mount filesystems:</p>
-            <pre><code>mount /dev/disk/by-label/nixos /mnt
-mkdir -p /mnt/boot
-mount /dev/disk/by-label/boot /mnt/boot</code></pre>
+                <li><strong>Summary:</strong>
+                    <ul>
+                        <li>Carefully review all settings</li>
+                        <li>Verify correct disk is selected</li>
+                        <li>Verify "No desktop" is selected</li>
+                        <li>Click Install when ready</li>
+                    </ul>
+                </li>
+            </ol>
 
-            <div class="info-box">
-                <h4>💾 Optional: Swap Partition</h4>
-                <p>If you want a swap partition (recommended for systems with &lt;8GB RAM):</p>
-                <pre><code># During partitioning, add:
-parted $DISK -- mkpart primary linux-swap 512MiB 8GiB
-parted $DISK -- mkpart primary 8GiB 100%
+            <p><span class="step-number">2.6</span> Wait for installation (10-20 minutes):</p>
+            <p>The installer will:</p>
+            <ul>
+                <li>Partition and format the disk</li>
+                <li>Install base NixOS system</li>
+                <li>Configure bootloader (systemd-boot)</li>
+                <li>Set up users and basic system</li>
+            </ul>
 
-# Format swap:
-mkswap -L swap ${DISK}p2
-swapon /dev/disk/by-label/swap
+            <p><span class="step-number">2.7</span> After installation completes:</p>
+            <ul>
+                <li>Uncheck "Restart now"</li>
+                <li>Click Done</li>
+                <li>Remove the USB drive</li>
+                <li>Manually reboot the system</li>
+            </ul>
 
-# Then format and mount root as ${DISK}p3</code></pre>
+            <div class="info-box success">
+                <h4>✅ Base Installation Complete!</h4>
+                <p>
+                    The graphical installer has set up your system with proper partitioning and bootloader.
+                    You're now ready to install Nihilix!
+                </p>
             </div>
         </div>
 
-        <h3>Step 3: Install Base NixOS</h3>
-        <div class="command-section">
-            <p><span class="step-number">3.1</span> Generate hardware configuration:</p>
-            <pre><code>nixos-generate-config --root /mnt
+        <h3>Step 3: Deploy Nihilix Configuration</h3>
 
-# Save this file - you'll need it!
-cat /mnt/etc/nixos/hardware-configuration.nix</code></pre>
-
-            <p><span class="step-number">3.2</span> Create minimal configuration:</p>
-            <pre><code>nano /mnt/etc/nixos/configuration.nix</code></pre>
-
-            <pre><code>{ config, pkgs, ... }:
-
-{
-  imports = [ ./hardware-configuration.nix ];
-
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-
-  networking.hostName = "nihilix";  # Change to your desired hostname
-  networking.networkmanager.enable = true;
-
-  time.timeZone = "Europe/Stockholm";  # Your timezone
-
-  users.users.martin = {  # Your username
-    isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" ];
-    initialPassword = "temppassword";
-  };
-
-  environment.systemPackages = with pkgs; [
-    vim
-    wget
-    git
-    curl
-  ];
-
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
-  system.stateVersion = "24.05";
-}</code></pre>
-
-            <p><span class="step-number">3.3</span> Install:</p>
-            <pre><code>nixos-install
-
-# Set root password when prompted
-# Then reboot
-reboot</code></pre>
+        <div class="info-box success">
+            <h4>✨ Two Installation Methods Available!</h4>
+            <p>
+                You can choose between <strong>automated</strong> (recommended) or <strong>manual</strong> configuration.
+                The automated script handles everything with interactive prompts.
+            </p>
         </div>
 
-        <h3>Step 4: Deploy Nihilix Configuration</h3>
+        <h4>Method A: Automated Installation (Recommended)</h4>
         <div class="command-section">
-            <p><span class="step-number">4.1</span> Login and clone your Nihilix fork:</p>
-            <pre><code>git clone https://github.com/YOUR-USERNAME/nihilix ~/.config/nixos
+            <p><span class="step-number">3A.1</span> Login with your user account (the one you created during installation)</p>
+
+            <p><span class="step-number">3A.2</span> Fork and clone your Nihilix repository:</p>
+            <pre><code># First, fork the repo on GitHub to your account
+# Then clone YOUR fork (replace YOUR-USERNAME)
+git clone https://github.com/YOUR-USERNAME/nihilix ~/.config/nixos
 cd ~/.config/nixos</code></pre>
 
-            <p><span class="step-number">4.2</span> Create your host configuration:</p>
+            <p><span class="step-number">3A.3</span> Run the automated installation script:</p>
+            <pre><code>./install.sh</code></pre>
+
+            <p>The script will interactively ask for all configuration details and automatically set everything up!</p>
+
+            <div class="info-box success">
+                <h4>✨ That's it!</h4>
+                <p>
+                    The script handles all the configuration, builds the system, and you're done!
+                    After the build completes, reboot into your new Hyprland system.
+                </p>
+            </div>
+
+            <p><span class="step-number">3A.4</span> Reboot when prompted:</p>
+            <pre><code>reboot</code></pre>
+        </div>
+
+        <h4>Method B: Manual Installation</h4>
+        <div class="command-section">
+            <p><span class="step-number">3B.1</span> Login with your user account (the one you created during installation)</p>
+
+            <div class="info-box success">
+                <h4>✨ Flakes Enabled Automatically!</h4>
+                <p>
+                    You don't need to manually enable flakes. Nihilix includes a <code>nixos/nix.nix</code> module that
+                    automatically enables <code>experimental-features = ["nix-command" "flakes"]</code> when you rebuild.
+                    The graphical installer's traditional configuration will be replaced by Nihilix's flake-based setup.
+                </p>
+            </div>
+
+            <p><span class="step-number">3B.2</span> Fork and clone your Nihilix repository:</p>
+            <pre><code># First, fork the repo on GitHub to your account
+# Then clone YOUR fork (replace YOUR-USERNAME)
+git clone https://github.com/YOUR-USERNAME/nihilix ~/.config/nixos
+cd ~/.config/nixos</code></pre>
+
+            <p><span class="step-number">3B.3</span> Create your host configuration:</p>
             <pre><code># Get your hostname
 HOSTNAME=$(hostname)
 
@@ -1015,18 +1137,31 @@ cp -r hosts/nihilix hosts/$HOSTNAME
 # Copy hardware config from system
 sudo cp /etc/nixos/hardware-configuration.nix hosts/$HOSTNAME/</code></pre>
 
-            <p><span class="step-number">4.3</span> Customize variables.nix as shown in VM section (Step 3.4)</p>
+            <p><span class="step-number">3B.4</span> Customize your host's variables.nix:</p>
+            <pre><code>nano hosts/$HOSTNAME/variables.nix</code></pre>
 
-            <p><span class="step-number">4.4</span> Add your host to flake.nix as shown in VM section (Step 3.5)</p>
+            <p>Update: hostname, username, timezone, keyboard layout, git info (see VM section for detailed example)</p>
 
-            <p><span class="step-number">4.5</span> Optional: Check for CHANGEME markers:</p>
+            <p><span class="step-number">3B.5</span> Add your host to flake.nix (see VM section for detailed example)</p>
+
+            <p><span class="step-number">3B.6</span> Optional: Review configuration and check for CHANGEME markers:</p>
             <pre><code>rg "CHANGEME" ~/.config/nixos</code></pre>
 
-            <p><span class="step-number">4.6</span> Add files to git and build:</p>
+            <p><span class="step-number">3B.7</span> Add files to git and build (flakes will be enabled automatically):</p>
             <pre><code>git add .
 sudo nixos-rebuild switch --flake ~/.config/nixos#$HOSTNAME</code></pre>
 
-            <p><span class="step-number">4.7</span> Reboot into your new system:</p>
+            <div class="info-box warning">
+                <h4>⏰ First Build Takes Time</h4>
+                <p>
+                    The first build will download Hyprland, all applications, and many dependencies. This can take
+                    20-40 minutes depending on your internet speed. The Nihilix configuration will automatically enable
+                    flakes and switch from the installer's mutable channels to reproducible flake-based management.
+                    Subsequent builds will be much faster!
+                </p>
+            </div>
+
+            <p><span class="step-number">3B.8</span> Reboot into your new system:</p>
             <pre><code>reboot</code></pre>
         </div>
 
