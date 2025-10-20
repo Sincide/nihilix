@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nihilix Complete Setup Guide</title>
+    <style>
+        :root {
+            --bg-primary: #0F0F15;
+            --bg-secondary: #15151A;
+            --bg-tertiary: #1e1e2e;
+            --text-primary: #cdd6f4;
+            --text-secondary: #bac2de;
+            --accent: #89b4fa;
+            --accent-hover: #74a0e0;
+            --success: #a6e3a1;
+            --warning: #f9e2af;
+            --danger: #f38ba8;
+            --border: #313244;
+            --code-bg: #11111b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--bg-secondary);
+            border-radius: 17px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            font-size: 3em;
+            color: var(--accent);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 2em;
+            color: var(--accent);
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        h3 {
+            font-size: 1.5em;
+            color: var(--text-primary);
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        h4 {
+            font-size: 1.2em;
+            color: var(--text-secondary);
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p, li {
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.2em;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+        }
+
+        .toc {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+            border: 1px solid var(--border);
+        }
+
+        .toc h3 {
+            margin-top: 0;
+            color: var(--accent);
+        }
+
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .toc li {
+            margin: 8px 0;
+        }
+
+        .toc a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .toc a:hover {
+            color: var(--accent);
+        }
+
+        .info-box {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--accent);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .info-box.warning {
+            border-left-color: var(--warning);
+        }
+
+        .info-box.danger {
+            border-left-color: var(--danger);
+        }
+
+        .info-box.success {
+            border-left-color: var(--success);
+        }
+
+        .info-box h4 {
+            margin-top: 0;
+            color: var(--accent);
+        }
+
+        .info-box.warning h4 {
+            color: var(--warning);
+        }
+
+        .info-box.danger h4 {
+            color: var(--danger);
+        }
+
+        .info-box.success h4 {
+            color: var(--success);
+        }
+
+        code {
+            background: var(--code-bg);
+            color: var(--accent);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: var(--code-bg);
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            border: 1px solid var(--border);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--text-primary);
+        }
+
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--code-bg);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: var(--bg-primary);
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 35px;
+            height: 35px;
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .command-section {
+            background: var(--bg-tertiary);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: var(--accent-hover);
+            text-decoration: underline;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .feature-card {
+            background: var(--bg-tertiary);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+        }
+
+        .feature-card h4 {
+            margin-top: 0;
+            color: var(--accent);
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--accent);
+            color: var(--bg-primary);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+        }
+
+        .back-to-top:hover {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Nihilix Complete Setup Guide</h1>
+        <p class="subtitle">A Comprehensive Guide for Testing in NixOS VM and Installing on Real Hardware</p>
+
+        <div class="toc">
+            <h3>📋 Table of Contents</h3>
+            <ul>
+                <li><a href="#introduction">1. Introduction</a></li>
+                <li><a href="#what-is-nihilix">2. What is Nihilix?</a></li>
+                <li><a href="#architecture">3. Repository Architecture</a></li>
+                <li><a href="#prerequisites">4. Prerequisites</a></li>
+                <li><a href="#vm-setup">5. Testing in NixOS VM</a></li>
+                <li><a href="#hardware-install">6. Installing on Real Hardware</a></li>
+                <li><a href="#customization">7. Customization Guide</a></li>
+                <li><a href="#daily-usage">8. Daily Usage & Workflows</a></li>
+                <li><a href="#troubleshooting">9. Troubleshooting</a></li>
+                <li><a href="#advanced">10. Advanced Topics</a></li>
+            </ul>
+        </div>
+
+        <h2 id="introduction">1. Introduction</h2>
+        <p>
+            This guide will walk you through the complete process of setting up and using the Nihilix NixOS configuration,
+            from testing it safely in a virtual machine to installing it on your actual hardware. Whether you're new to
+            NixOS or an experienced user, this guide covers everything you need to know.
+        </p>
+
+        <div class="info-box success">
+            <h4>✨ What You'll Learn</h4>
+            <ul>
+                <li>Understanding the Nihilix repository structure</li>
+                <li>Setting up a NixOS VM for safe testing</li>
+                <li>Customizing your configuration</li>
+                <li>Installing on real hardware</li>
+                <li>Daily workflows and system management</li>
+            </ul>
+        </div>
+
+        <h2 id="what-is-nihilix">2. What is Nihilix?</h2>
+        <p>
+            <strong>Nihilix</strong> is a personal fork of <a href="https://github.com/anotherhadi/nixy" target="_blank">Nixy</a>,
+            a NixOS configuration framework that simplifies and unifies the Hyprland desktop environment ecosystem. It provides
+            a modular, declarative, and reproducible way to manage your entire system configuration.
+        </p>
+
+        <h3>Key Features</h3>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4>🪟 Hyprland-Centric</h4>
+                <p>Complete Hyprland ecosystem preconfigured: Hyprlock, Hyprpanel, Hyprpaper, Hypridle, and more.</p>
+            </div>
+            <div class="feature-card">
+                <h4>🎨 Unified Theming</h4>
+                <p>Base16 & Stylix-powered themes that apply consistently across all applications.</p>
+            </div>
+            <div class="feature-card">
+                <h4>⌨️ Vim-Like Keybindings</h4>
+                <p>Consistent navigation across Hyprland, Neovim, browser (Vimium), and more.</p>
+            </div>
+            <div class="feature-card">
+                <h4>📦 Modular Design</h4>
+                <p>Enable or disable entire subsystems by simply commenting import lines.</p>
+            </div>
+            <div class="feature-card">
+                <h4>🔄 Reproducible</h4>
+                <p>Nix Flakes ensure your configuration works identically across all machines.</p>
+            </div>
+            <div class="feature-card">
+                <h4>🔐 Secrets Management</h4>
+                <p>Built-in SOPS-nix integration for secure credential handling.</p>
+            </div>
+        </div>
+
+        <h3>Technologies Used</h3>
+        <table>
+            <tr>
+                <th>Category</th>
+                <th>Technology</th>
+                <th>Purpose</th>
+            </tr>
+            <tr>
+                <td>OS</td>
+                <td>NixOS (unstable)</td>
+                <td>Declarative Linux distribution</td>
+            </tr>
+            <tr>
+                <td>Window Manager</td>
+                <td>Hyprland</td>
+                <td>Dynamic tiling Wayland compositor</td>
+            </tr>
+            <tr>
+                <td>Configuration</td>
+                <td>Home-Manager</td>
+                <td>User-level configuration management</td>
+            </tr>
+            <tr>
+                <td>Theming</td>
+                <td>Stylix</td>
+                <td>Unified Base16 color schemes</td>
+            </tr>
+            <tr>
+                <td>Terminal</td>
+                <td>Alacritty</td>
+                <td>GPU-accelerated terminal emulator</td>
+            </tr>
+            <tr>
+                <td>Shell</td>
+                <td>Zsh + Starship</td>
+                <td>Modern shell with beautiful prompt</td>
+            </tr>
+            <tr>
+                <td>Editor</td>
+                <td>Neovim (NVF)</td>
+                <td>Preconfigured Neovim with LSP support</td>
+            </tr>
+        </table>
+
+        <h2 id="architecture">3. Repository Architecture</h2>
+        <p>
+            Understanding the structure of Nihilix is crucial for customization. The repository is organized into several
+            key directories, each serving a specific purpose.
+        </p>
+
+        <h3>Directory Structure</h3>
+        <pre><code>nihilix/
+├── flake.nix                 # Main entry point - defines all hosts
+├── flake.lock                # Dependency lock file
+│
+├── hosts/                    # Host-specific configurations
+│   ├── laptop/               # Example: laptop configuration
+│   ├── nihilix/              # Example: desktop configuration
+│   └── server/               # Example: server configuration
+│       ├── configuration.nix # System configuration
+│       ├── home.nix          # User environment
+│       ├── variables.nix     # Host-specific variables
+│       └── hardware-configuration.nix # Hardware detection
+│
+├── nixos/                    # System-level modules
+│   ├── audio.nix             # PulseAudio/ALSA
+│   ├── bluetooth.nix         # Bluetooth support
+│   ├── hyprland.nix          # Hyprland enablement
+│   ├── nvidia.nix            # NVIDIA drivers
+│   ├── docker.nix            # Docker support
+│   └── ...                   # More system modules
+│
+├── home/                     # User-level configuration
+│   ├── programs/             # Application configs
+│   │   ├── alacritty/        # Terminal
+│   │   ├── nvf/              # Neovim
+│   │   ├── shell/            # Zsh, Starship
+│   │   └── ...               # More programs
+│   ├── scripts/              # Utility bash scripts
+│   └── system/               # Desktop environment
+│       ├── hyprland/         # Hyprland config
+│       ├── hyprlock/         # Lock screen
+│       ├── hyprpanel/        # Top panel
+│       └── ...               # More DE components
+│
+├── themes/                   # Visual themes
+│   ├── catppuccin.nix        # Catppuccin theme
+│   └── nixy.nix              # Nixy custom theme
+│
+├── server-modules/           # Server services
+│   ├── nginx.nix             # Reverse proxy
+│   ├── bitwarden.nix         # Password manager
+│   └── ...                   # More services
+│
+└── docs/                     # Documentation
+    ├── KEYBINDINGS-HYPRLAND.md
+    ├── SCRIPTS.md
+    ├── THEMES.md
+    └── SERVER.md</code></pre>
+
+        <h3>Configuration Flow</h3>
+        <div class="info-box">
+            <h4>📊 How It All Connects</h4>
+            <ol>
+                <li><strong>flake.nix</strong> defines which host to build</li>
+                <li>Each host has a <strong>configuration.nix</strong> that imports system modules</li>
+                <li>Each host has a <strong>home.nix</strong> that imports user programs and scripts</li>
+                <li>Each host has a <strong>variables.nix</strong> that defines customization options</li>
+                <li><strong>hardware-configuration.nix</strong> is auto-generated for each machine</li>
+            </ol>
+        </div>
+
+        <h2 id="prerequisites">4. Prerequisites</h2>
+
+        <h3>For VM Testing</h3>
+        <ul>
+            <li><strong>Host OS:</strong> Any Linux distribution (or Windows with WSL2/VM software)</li>
+            <li><strong>Virtualization:</strong> QEMU/KVM, VirtualBox, or VMware</li>
+            <li><strong>RAM:</strong> At least 4GB allocated to VM (8GB recommended)</li>
+            <li><strong>Storage:</strong> 20GB minimum (40GB recommended)</li>
+            <li><strong>NixOS ISO:</strong> Latest NixOS minimal or graphical ISO from <a href="https://nixos.org/download.html" target="_blank">nixos.org</a></li>
+        </ul>
+
+        <h3>For Real Hardware Installation</h3>
+        <ul>
+            <li><strong>Bootable USB:</strong> 4GB+ USB drive</li>
+            <li><strong>System Requirements:</strong>
+                <ul>
+                    <li>64-bit x86 CPU (Intel/AMD)</li>
+                    <li>4GB RAM minimum (8GB+ recommended)</li>
+                    <li>40GB free disk space (100GB+ recommended)</li>
+                    <li>UEFI boot support (recommended)</li>
+                </ul>
+            </li>
+            <li><strong>Backup:</strong> Complete backup of important data!</li>
+            <li><strong>Internet Connection:</strong> Required during installation</li>
+        </ul>
+
+        <h3>Required Knowledge</h3>
+        <div class="info-box warning">
+            <h4>⚠️ Important Skills</h4>
+            <ul>
+                <li>Basic Linux command-line familiarity</li>
+                <li>Understanding of partitioning and filesystems</li>
+                <li>Git basics (clone, commit, push)</li>
+                <li>Text editor usage (nano, vim, or neovim)</li>
+            </ul>
+        </div>
+
+        <h2 id="vm-setup">5. Testing in NixOS VM</h2>
+        <p>
+            Testing Nihilix in a VM first is <strong>highly recommended</strong>. This allows you to experiment safely
+            without affecting your main system.
+        </p>
+
+        <h3>Step 1: Create the Virtual Machine</h3>
+
+        <h4>Using QEMU/KVM (Recommended for Linux)</h4>
+        <div class="command-section">
+            <p><span class="step-number">1.1</span> Install QEMU and related tools:</p>
+            <pre><code># On Arch-based systems
+sudo pacman -S qemu-full virt-manager
+
+# On Debian/Ubuntu
+sudo apt install qemu-kvm virt-manager
+
+# On Fedora
+sudo dnf install @virtualization</code></pre>
+
+            <p><span class="step-number">1.2</span> Download NixOS ISO:</p>
+            <pre><code>cd ~/Downloads
+wget https://channels.nixos.org/nixos-unstable/latest-nixos-minimal-x86_64-linux.iso</code></pre>
+
+            <p><span class="step-number">1.3</span> Create VM using virt-manager:</p>
+            <ol>
+                <li>Open virt-manager: <code>virt-manager</code></li>
+                <li>Click "Create a new virtual machine"</li>
+                <li>Select "Local install media (ISO image)"</li>
+                <li>Browse to the downloaded NixOS ISO</li>
+                <li>Allocate at least 4096MB RAM and 2 CPUs</li>
+                <li>Create 40GB virtual disk</li>
+                <li>Name it "nixos-test" and check "Customize before install"</li>
+                <li>In Boot Options, enable UEFI (select OVMF_CODE.fd)</li>
+                <li>Begin installation</li>
+            </ol>
+        </div>
+
+        <h4>Using VirtualBox</h4>
+        <div class="command-section">
+            <ol>
+                <li>Download and install <a href="https://www.virtualbox.org/" target="_blank">VirtualBox</a></li>
+                <li>Download NixOS ISO from <a href="https://nixos.org/download.html" target="_blank">nixos.org</a></li>
+                <li>Create new VM:
+                    <ul>
+                        <li>Type: Linux</li>
+                        <li>Version: Other Linux (64-bit)</li>
+                        <li>RAM: 4096MB (8192MB recommended)</li>
+                        <li>Create virtual hard disk: VDI, Dynamically allocated, 40GB</li>
+                    </ul>
+                </li>
+                <li>Configure VM:
+                    <ul>
+                        <li>System → Enable EFI</li>
+                        <li>Storage → Attach NixOS ISO to IDE Controller</li>
+                        <li>Network → Adapter 1: NAT</li>
+                    </ul>
+                </li>
+                <li>Start the VM</li>
+            </ol>
+        </div>
+
+        <h3>Step 2: Install Base NixOS</h3>
+        <div class="info-box">
+            <h4>💡 Installation Strategy</h4>
+            <p>
+                We'll install a minimal NixOS system first, then clone Nihilix and rebuild. This is the safest approach.
+            </p>
+        </div>
+
+        <div class="command-section">
+            <p><span class="step-number">2.1</span> Boot into the NixOS installer and become root:</p>
+            <pre><code>sudo -i</code></pre>
+
+            <p><span class="step-number">2.2</span> Partition the disk (using UEFI/GPT):</p>
+            <pre><code># List available disks
+lsblk
+
+# Create partitions (assuming /dev/vda or /dev/sda)
+parted /dev/vda -- mklabel gpt
+parted /dev/vda -- mkpart ESP fat32 1MiB 512MiB
+parted /dev/vda -- set 1 esp on
+parted /dev/vda -- mkpart primary 512MiB 100%</code></pre>
+
+            <p><span class="step-number">2.3</span> Format the partitions:</p>
+            <pre><code># Format boot partition
+mkfs.fat -F 32 -n boot /dev/vda1
+
+# Format root partition
+mkfs.ext4 -L nixos /dev/vda2</code></pre>
+
+            <p><span class="step-number">2.4</span> Mount the partitions:</p>
+            <pre><code>mount /dev/disk/by-label/nixos /mnt
+mkdir -p /mnt/boot
+mount /dev/disk/by-label/boot /mnt/boot</code></pre>
+
+            <p><span class="step-number">2.5</span> Generate initial configuration:</p>
+            <pre><code>nixos-generate-config --root /mnt</code></pre>
+
+            <p><span class="step-number">2.6</span> Edit configuration for basic system:</p>
+            <pre><code>nano /mnt/etc/nixos/configuration.nix</code></pre>
+
+            <p>Add these essential settings:</p>
+            <pre><code>{ config, pkgs, ... }:
+
+{
+  imports = [ ./hardware-configuration.nix ];
+
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
+  networking.hostName = "nixos-test";
+  networking.networkmanager.enable = true;
+
+  time.timeZone = "Europe/Stockholm";  # Change to your timezone
+
+  users.users.martin = {  # Change 'martin' to your username
+    isNormalUser = true;
+    extraGroups = [ "wheel" "networkmanager" ];
+    initialPassword = "password";  # Change after first login!
+  };
+
+  environment.systemPackages = with pkgs; [
+    vim
+    wget
+    git
+    curl
+  ];
+
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  system.stateVersion = "24.05";
+}</code></pre>
+
+            <p><span class="step-number">2.7</span> Install the system:</p>
+            <pre><code>nixos-install
+
+# Set root password when prompted
+# Then reboot
+reboot</code></pre>
+        </div>
+
+        <h3>Step 3: Clone and Configure Nihilix</h3>
+        <div class="command-section">
+            <p><span class="step-number">3.1</span> After reboot, login with your user and get the system hostname:</p>
+            <pre><code>hostname
+# Should show: nixos-test</code></pre>
+
+            <p><span class="step-number">3.2</span> Fork and clone Nihilix:</p>
+            <pre><code># First, fork the repo on GitHub to your account
+# Then clone YOUR fork (not the original)
+git clone https://github.com/YOUR-USERNAME/nihilix ~/.config/nixos
+cd ~/.config/nixos</code></pre>
+
+            <p><span class="step-number">3.3</span> Create your host configuration:</p>
+            <pre><code># Copy the nihilix host as a template
+cp -r hosts/nihilix hosts/nixos-test
+
+# Copy the hardware configuration from the installer
+sudo cp /etc/nixos/hardware-configuration.nix hosts/nixos-test/</code></pre>
+
+            <p><span class="step-number">3.4</span> Edit your host variables:</p>
+            <pre><code>nano hosts/nixos-test/variables.nix</code></pre>
+
+            <p>Update these values:</p>
+            <pre><code>{
+  config,
+  lib,
+  ...
+}: {
+  imports = [
+    ../../themes/catppuccin.nix  # or choose another theme
+  ];
+
+  config.var = {
+    hostname = "nixos-test";  # MUST match your actual hostname
+    username = "martin";      # CHANGE to your username
+    configDirectory = "/home/martin/.config/nixos";  # Update username
+
+    keyboardLayout = "se";    # Change to your layout (us, de, fr, etc.)
+
+    location = "Sweden";
+    timeZone = "Europe/Stockholm";
+    defaultLocale = "en_US.UTF-8";
+    extraLocale = "sv_SE.UTF-8";
+
+    git = {
+      username = "YourGitHubUsername";
+      email = "your.email@example.com";
+    };
+
+    autoUpgrade = false;
+    autoGarbageCollector = true;
+  };
+
+  options = {
+    var = lib.mkOption {
+      type = lib.types.attrs;
+      default = {};
+    };
+  };
+}</code></pre>
+
+            <p><span class="step-number">3.5</span> Register your host in flake.nix:</p>
+            <pre><code>nano flake.nix</code></pre>
+
+            <p>Add your host configuration:</p>
+            <pre><code>outputs = inputs @ {nixpkgs, ...}: {
+  nixosConfigurations = {
+    # ... existing configurations ...
+
+    nixos-test = nixpkgs.lib.nixosSystem {
+      modules = [
+        {
+          nixpkgs.overlays = [];
+          _module.args = {
+            inherit inputs;
+          };
+        }
+        inputs.home-manager.nixosModules.home-manager
+        inputs.stylix.nixosModules.stylix
+        ./hosts/nixos-test/configuration.nix
+      ];
+    };
+  };
+};</code></pre>
+
+            <p><span class="step-number">3.6</span> Review and optionally disable modules you don't need:</p>
+            <pre><code>nano hosts/nixos-test/configuration.nix</code></pre>
+
+            <p>Comment out modules you don't want (e.g., NVIDIA, Docker, Tailscale):</p>
+            <pre><code>imports = [
+  ../../nixos/audio.nix
+  ../../nixos/bluetooth.nix
+  # ../../nixos/nvidia.nix        # Disable if no NVIDIA GPU
+  # ../../nixos/docker.nix        # Disable if not using Docker
+  # ../../nixos/tailscale.nix     # Disable if not using Tailscale
+  ../../nixos/fonts.nix
+  ../../nixos/home-manager.nix
+  ../../nixos/nix.nix
+  ../../nixos/systemd-boot.nix
+  ../../nixos/sddm.nix
+  ../../nixos/users.nix
+  ../../nixos/utils.nix
+  ../../nixos/hyprland.nix
+
+  ./hardware-configuration.nix
+  ./variables.nix
+];</code></pre>
+
+            <p><span class="step-number">3.7</span> Add all files to git (required for flakes):</p>
+            <pre><code>git add .</code></pre>
+
+            <p><span class="step-number">3.8</span> Build and switch to Nihilix configuration:</p>
+            <pre><code>sudo nixos-rebuild switch --flake ~/.config/nixos#nixos-test</code></pre>
+
+            <div class="info-box warning">
+                <h4>⚠️ First Build Takes Time</h4>
+                <p>
+                    The first build will download many packages and may take 15-30 minutes depending on your internet speed.
+                    Be patient! Subsequent builds will be much faster.
+                </p>
+            </div>
+
+            <p><span class="step-number">3.9</span> Reboot to start Hyprland:</p>
+            <pre><code>reboot</code></pre>
+        </div>
+
+        <h3>Step 4: Test and Explore</h3>
+        <div class="command-section">
+            <p>After rebooting, you should see the SDDM login manager with the Catppuccin theme. Login and explore:</p>
+
+            <ul>
+                <li><strong>SUPER + SPACE</strong> - Open application launcher (Wofi)</li>
+                <li><strong>SUPER + RETURN</strong> - Open terminal (Alacritty)</li>
+                <li><strong>SUPER + Q</strong> - Close window</li>
+                <li><strong>SUPER + L</strong> - Lock screen</li>
+                <li><strong>SUPER + X</strong> - Power menu</li>
+            </ul>
+
+            <p>Try the system management wizard:</p>
+            <pre><code>nixy</code></pre>
+
+            <p>This interactive tool helps you:</p>
+            <ul>
+                <li>Rebuild the system</li>
+                <li>Update packages</li>
+                <li>Clean old generations</li>
+                <li>Garbage collect</li>
+            </ul>
+        </div>
+
+        <div class="info-box success">
+            <h4>✅ VM Testing Complete!</h4>
+            <p>
+                Congratulations! You now have Nihilix running in a VM. Spend some time exploring, customizing, and making sure
+                everything works as expected before proceeding to hardware installation.
+            </p>
+        </div>
+
+        <h2 id="hardware-install">6. Installing on Real Hardware</h2>
+        <p>
+            Once you're confident with your configuration in the VM, you're ready to install on real hardware.
+        </p>
+
+        <div class="info-box danger">
+            <h4>🚨 CRITICAL: Backup Everything!</h4>
+            <p>
+                Before proceeding, make sure you have complete backups of all important data. Installing NixOS will erase
+                the target partition(s). This process is irreversible!
+            </p>
+        </div>
+
+        <h3>Step 1: Prepare Installation Media</h3>
+        <div class="command-section">
+            <p><span class="step-number">1.1</span> Download the NixOS ISO:</p>
+            <pre><code>wget https://channels.nixos.org/nixos-unstable/latest-nixos-minimal-x86_64-linux.iso</code></pre>
+
+            <p><span class="step-number">1.2</span> Create bootable USB (Linux):</p>
+            <pre><code># Find your USB device (be VERY careful here!)
+lsblk
+
+# Write ISO to USB (replace /dev/sdX with your USB device)
+# WARNING: This will ERASE all data on the USB!
+sudo dd if=latest-nixos-minimal-x86_64-linux.iso of=/dev/sdX bs=4M status=progress oflag=sync</code></pre>
+
+            <p>On Windows, use <a href="https://rufus.ie/" target="_blank">Rufus</a> or <a href="https://www.balena.io/etcher/" target="_blank">Balena Etcher</a>.</p>
+        </div>
+
+        <h3>Step 2: Boot and Partition</h3>
+        <div class="command-section">
+            <p><span class="step-number">2.1</span> Boot from the USB:</p>
+            <ul>
+                <li>Restart computer</li>
+                <li>Enter BIOS/UEFI (usually F2, F12, DEL, or ESC during boot)</li>
+                <li>Disable Secure Boot (if enabled)</li>
+                <li>Set USB as first boot device</li>
+                <li>Save and restart</li>
+            </ul>
+
+            <p><span class="step-number">2.2</span> Connect to internet:</p>
+            <pre><code># For WiFi
+sudo systemctl start wpa_supplicant
+wpa_cli
+
+# In wpa_cli:
+> add_network
+0
+> set_network 0 ssid "YourWiFiName"
+> set_network 0 psk "YourWiFiPassword"
+> enable_network 0
+> quit
+
+# Test connection
+ping -c 3 nixos.org</code></pre>
+
+            <p><span class="step-number">2.3</span> Become root and identify your disk:</p>
+            <pre><code>sudo -i
+lsblk  # Carefully note which disk is your target (e.g., /dev/nvme0n1, /dev/sda)</code></pre>
+
+            <div class="info-box danger">
+                <h4>⚠️ Double-Check Your Disk!</h4>
+                <p>
+                    Make absolutely sure you're working with the correct disk. The next commands will PERMANENTLY ERASE
+                    all data on the specified disk. There is NO undo!
+                </p>
+            </div>
+
+            <p><span class="step-number">2.4</span> Partition the disk (UEFI/GPT recommended):</p>
+            <pre><code># Replace /dev/nvme0n1 with your actual disk
+DISK=/dev/nvme0n1  # or /dev/sda for SATA drives
+
+# Create GPT partition table
+parted $DISK -- mklabel gpt
+
+# Create EFI System Partition (512MB)
+parted $DISK -- mkpart ESP fat32 1MiB 512MiB
+parted $DISK -- set 1 esp on
+
+# Create root partition (rest of disk)
+parted $DISK -- mkpart primary 512MiB 100%
+
+# Verify partitions
+parted $DISK -- print</code></pre>
+
+            <p><span class="step-number">2.5</span> Format partitions:</p>
+            <pre><code># Format boot partition
+mkfs.fat -F 32 -n boot ${DISK}p1  # Use ${DISK}1 for SATA (e.g., /dev/sda1)
+
+# Format root partition
+mkfs.ext4 -L nixos ${DISK}p2      # Use ${DISK}2 for SATA</code></pre>
+
+            <p><span class="step-number">2.6</span> Mount filesystems:</p>
+            <pre><code>mount /dev/disk/by-label/nixos /mnt
+mkdir -p /mnt/boot
+mount /dev/disk/by-label/boot /mnt/boot</code></pre>
+
+            <div class="info-box">
+                <h4>💾 Optional: Swap Partition</h4>
+                <p>If you want a swap partition (recommended for systems with &lt;8GB RAM):</p>
+                <pre><code># During partitioning, add:
+parted $DISK -- mkpart primary linux-swap 512MiB 8GiB
+parted $DISK -- mkpart primary 8GiB 100%
+
+# Format swap:
+mkswap -L swap ${DISK}p2
+swapon /dev/disk/by-label/swap
+
+# Then format and mount root as ${DISK}p3</code></pre>
+            </div>
+        </div>
+
+        <h3>Step 3: Install Base NixOS</h3>
+        <div class="command-section">
+            <p><span class="step-number">3.1</span> Generate hardware configuration:</p>
+            <pre><code>nixos-generate-config --root /mnt
+
+# Save this file - you'll need it!
+cat /mnt/etc/nixos/hardware-configuration.nix</code></pre>
+
+            <p><span class="step-number">3.2</span> Create minimal configuration:</p>
+            <pre><code>nano /mnt/etc/nixos/configuration.nix</code></pre>
+
+            <pre><code>{ config, pkgs, ... }:
+
+{
+  imports = [ ./hardware-configuration.nix ];
+
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
+  networking.hostName = "nihilix";  # Change to your desired hostname
+  networking.networkmanager.enable = true;
+
+  time.timeZone = "Europe/Stockholm";  # Your timezone
+
+  users.users.martin = {  # Your username
+    isNormalUser = true;
+    extraGroups = [ "wheel" "networkmanager" ];
+    initialPassword = "temppassword";
+  };
+
+  environment.systemPackages = with pkgs; [
+    vim
+    wget
+    git
+    curl
+  ];
+
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  system.stateVersion = "24.05";
+}</code></pre>
+
+            <p><span class="step-number">3.3</span> Install:</p>
+            <pre><code>nixos-install
+
+# Set root password when prompted
+# Then reboot
+reboot</code></pre>
+        </div>
+
+        <h3>Step 4: Deploy Nihilix Configuration</h3>
+        <div class="command-section">
+            <p><span class="step-number">4.1</span> Login and clone your Nihilix fork:</p>
+            <pre><code>git clone https://github.com/YOUR-USERNAME/nihilix ~/.config/nixos
+cd ~/.config/nixos</code></pre>
+
+            <p><span class="step-number">4.2</span> Create your host configuration:</p>
+            <pre><code># Get your hostname
+HOSTNAME=$(hostname)
+
+# Copy template
+cp -r hosts/nihilix hosts/$HOSTNAME
+
+# Copy hardware config from system
+sudo cp /etc/nixos/hardware-configuration.nix hosts/$HOSTNAME/</code></pre>
+
+            <p><span class="step-number">4.3</span> Customize variables.nix as shown in VM section (Step 3.4)</p>
+
+            <p><span class="step-number">4.4</span> Add your host to flake.nix as shown in VM section (Step 3.5)</p>
+
+            <p><span class="step-number">4.5</span> Optional: Check for CHANGEME markers:</p>
+            <pre><code>rg "CHANGEME" ~/.config/nixos</code></pre>
+
+            <p><span class="step-number">4.6</span> Add files to git and build:</p>
+            <pre><code>git add .
+sudo nixos-rebuild switch --flake ~/.config/nixos#$HOSTNAME</code></pre>
+
+            <p><span class="step-number">4.7</span> Reboot into your new system:</p>
+            <pre><code>reboot</code></pre>
+        </div>
+
+        <div class="info-box success">
+            <h4>🎉 Installation Complete!</h4>
+            <p>
+                You now have Nihilix running on real hardware! Your system is fully declarative and reproducible.
+            </p>
+        </div>
+
+        <h2 id="customization">7. Customization Guide</h2>
+        <p>
+            One of Nihilix's strengths is its modularity. Here's how to customize various aspects.
+        </p>
+
+        <h3>Changing Themes</h3>
+        <div class="command-section">
+            <p><span class="step-number">1</span> Edit your host's variables.nix:</p>
+            <pre><code>nano hosts/YOUR-HOST/variables.nix</code></pre>
+
+            <p><span class="step-number">2</span> Change the theme import:</p>
+            <pre><code>imports = [
+  # Choose one:
+  ../../themes/catppuccin.nix
+  # ../../themes/nixy.nix
+];</code></pre>
+
+            <p><span class="step-number">3</span> Rebuild:</p>
+            <pre><code>sudo nixos-rebuild switch --flake ~/.config/nixos#$(hostname)</code></pre>
+        </div>
+
+        <h3>Creating Your Own Theme</h3>
+        <div class="command-section">
+            <pre><code>cp themes/catppuccin.nix themes/mytheme.nix
+nano themes/mytheme.nix</code></pre>
+
+            <p>Customize the base16 colors (base00-base0F) and other options:</p>
+            <pre><code>base16Scheme = {
+  base00 = "1e1e2e";  # Default Background
+  base01 = "181825";  # Lighter Background
+  base02 = "313244";  # Selection Background
+  base03 = "45475a";  # Comments
+  base04 = "585b70";  # Dark Foreground
+  base05 = "cdd6f4";  # Default Foreground
+  # ... and so on
+};</code></pre>
+
+            <p>Update your variables.nix to use the new theme:</p>
+            <pre><code>imports = [ ../../themes/mytheme.nix ];</code></pre>
+        </div>
+
+        <h3>Adding/Removing Programs</h3>
+        <div class="command-section">
+            <p>Edit your host's home.nix:</p>
+            <pre><code>nano hosts/YOUR-HOST/home.nix</code></pre>
+
+            <p>Add programs to imports:</p>
+            <pre><code>imports = [
+  # ... existing imports ...
+  ../../home/programs/myprogram
+];</code></pre>
+
+            <p>Or add packages directly:</p>
+            <pre><code>home.packages = with pkgs; [
+  firefox
+  thunderbird
+  libreoffice
+  gimp
+];</code></pre>
+        </div>
+
+        <h3>Customizing Hyprland Keybindings</h3>
+        <div class="command-section">
+            <p>Edit the Hyprland configuration:</p>
+            <pre><code>nano home/system/hyprland/default.nix</code></pre>
+
+            <p>Find the bindings section and modify as needed. Rebuild after changes.</p>
+        </div>
+
+        <h3>Theme Customization Options</h3>
+        <p>Edit your theme file to customize visual appearance:</p>
+        <table>
+            <tr>
+                <th>Option</th>
+                <th>Description</th>
+                <th>Default</th>
+            </tr>
+            <tr>
+                <td>rounding</td>
+                <td>Window corner radius</td>
+                <td>17</td>
+            </tr>
+            <tr>
+                <td>gaps-in</td>
+                <td>Inner gaps between windows</td>
+                <td>8</td>
+            </tr>
+            <tr>
+                <td>gaps-out</td>
+                <td>Outer gaps from screen edge</td>
+                <td>16</td>
+            </tr>
+            <tr>
+                <td>active-opacity</td>
+                <td>Opacity of focused window</td>
+                <td>0.97</td>
+            </tr>
+            <tr>
+                <td>inactive-opacity</td>
+                <td>Opacity of unfocused windows</td>
+                <td>0.94</td>
+            </tr>
+            <tr>
+                <td>blur</td>
+                <td>Enable blur effects</td>
+                <td>true</td>
+            </tr>
+            <tr>
+                <td>border-size</td>
+                <td>Window border thickness</td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td>animation-speed</td>
+                <td>Animation speed preset</td>
+                <td>"fast"</td>
+            </tr>
+        </table>
+
+        <h3>NVIDIA GPU Configuration</h3>
+        <div class="command-section">
+            <p>If you have an NVIDIA GPU:</p>
+            <pre><code>nano hosts/YOUR-HOST/configuration.nix</code></pre>
+
+            <p>Uncomment the NVIDIA module:</p>
+            <pre><code>imports = [
+  ../../nixos/nvidia.nix  # Uncomment this line
+  # ... other imports ...
+];</code></pre>
+
+            <p>Rebuild to install NVIDIA drivers.</p>
+        </div>
+
+        <h2 id="daily-usage">8. Daily Usage & Workflows</h2>
+
+        <h3>Essential Keybindings</h3>
+        <table>
+            <tr>
+                <th>Action</th>
+                <th>Keybinding</th>
+            </tr>
+            <tr>
+                <td>Open Launcher</td>
+                <td>SUPER + SPACE</td>
+            </tr>
+            <tr>
+                <td>Open Terminal</td>
+                <td>SUPER + RETURN</td>
+            </tr>
+            <tr>
+                <td>Close Window</td>
+                <td>SUPER + Q</td>
+            </tr>
+            <tr>
+                <td>Toggle Floating</td>
+                <td>SUPER + T</td>
+            </tr>
+            <tr>
+                <td>Toggle Fullscreen</td>
+                <td>SUPER + F</td>
+            </tr>
+            <tr>
+                <td>Lock Screen</td>
+                <td>SUPER + L</td>
+            </tr>
+            <tr>
+                <td>Power Menu</td>
+                <td>SUPER + X</td>
+            </tr>
+            <tr>
+                <td>Switch Workspace</td>
+                <td>SUPER + 1-9</td>
+            </tr>
+            <tr>
+                <td>Move Window to Workspace</td>
+                <td>SHIFT + SUPER + 1-9</td>
+            </tr>
+            <tr>
+                <td>Screenshot Region</td>
+                <td>SUPER + PRINT</td>
+            </tr>
+            <tr>
+                <td>Toggle Night Shift</td>
+                <td>SHIFT + SUPER + F2</td>
+            </tr>
+        </table>
+
+        <p>See <code>docs/KEYBINDINGS-HYPRLAND.md</code> for the complete list.</p>
+
+        <h3>System Management with Nixy</h3>
+        <div class="command-section">
+            <p>The <code>nixy</code> command provides an interactive wizard for common tasks:</p>
+            <pre><code>nixy</code></pre>
+
+            <p>Available operations:</p>
+            <ul>
+                <li><strong>Rebuild</strong> - Apply configuration changes</li>
+                <li><strong>Update</strong> - Update flake inputs</li>
+                <li><strong>Upgrade</strong> - Update and rebuild</li>
+                <li><strong>Garbage Collect</strong> - Remove old generations</li>
+                <li><strong>Clean Boot</strong> - Remove old boot entries</li>
+            </ul>
+
+            <p>Or use direct commands:</p>
+            <pre><code>nixy rebuild  # Just rebuild
+nixy update   # Just update
+nixy gc       # Garbage collect</code></pre>
+        </div>
+
+        <h3>Updating Your System</h3>
+        <div class="command-section">
+            <p><span class="step-number">1</span> Update flake inputs (updates packages):</p>
+            <pre><code>cd ~/.config/nixos
+nix flake update</code></pre>
+
+            <p><span class="step-number">2</span> Rebuild with new packages:</p>
+            <pre><code>sudo nixos-rebuild switch --flake ~/.config/nixos#$(hostname)</code></pre>
+
+            <p>Or use the nixy helper:</p>
+            <pre><code>nixy upgrade</code></pre>
+        </div>
+
+        <h3>Managing Configurations with Git</h3>
+        <div class="command-section">
+            <p>Your Nihilix configuration is a git repository. Use version control!</p>
+
+            <pre><code># After making changes
+cd ~/.config/nixos
+git add .
+git commit -m "feat: updated theme to catppuccin"
+git push
+
+# To revert to a previous configuration
+git log                    # Find the commit hash
+git checkout COMMIT-HASH   # Restore that version
+sudo nixos-rebuild switch --flake .#$(hostname)
+
+# Return to latest
+git checkout main</code></pre>
+        </div>
+
+        <h3>Rolling Back Changes</h3>
+        <div class="command-section">
+            <p>If something breaks, NixOS makes it easy to rollback:</p>
+
+            <pre><code># List available generations
+sudo nix-env --list-generations --profile /nix/var/nix/profiles/system
+
+# Rollback to previous generation
+sudo nixos-rebuild switch --rollback
+
+# Or select a specific generation
+sudo nix-env --switch-generation GENERATION-NUMBER --profile /nix/var/nix/profiles/system
+sudo /nix/var/nix/profiles/system/bin/switch-to-configuration switch</code></pre>
+
+            <p>You can also select a previous generation from the boot menu (systemd-boot).</p>
+        </div>
+
+        <h3>Utility Scripts</h3>
+        <p>Nihilix includes many utility scripts (see <code>docs/SCRIPTS.md</code>):</p>
+        <table>
+            <tr>
+                <th>Script</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><code>brightness-up</code></td>
+                <td>Increase screen brightness by 5%</td>
+            </tr>
+            <tr>
+                <td><code>brightness-down</code></td>
+                <td>Decrease screen brightness by 5%</td>
+            </tr>
+            <tr>
+                <td><code>sound-up</code></td>
+                <td>Increase volume by 5%</td>
+            </tr>
+            <tr>
+                <td><code>sound-down</code></td>
+                <td>Decrease volume by 5%</td>
+            </tr>
+            <tr>
+                <td><code>caffeine</code></td>
+                <td>Toggle hypridle (prevent sleep/lock)</td>
+            </tr>
+            <tr>
+                <td><code>night-shift</code></td>
+                <td>Toggle blue light filter</td>
+            </tr>
+            <tr>
+                <td><code>hyprfocus-toggle</code></td>
+                <td>Toggle focus mode (minimal distractions)</td>
+            </tr>
+            <tr>
+                <td><code>screenshot region</code></td>
+                <td>Take screenshot of selected region</td>
+            </tr>
+            <tr>
+                <td><code>lock</code></td>
+                <td>Lock the screen</td>
+            </tr>
+            <tr>
+                <td><code>powermode-toggle</code></td>
+                <td>Toggle power mode (performance/balanced)</td>
+            </tr>
+        </table>
+
+        <h2 id="troubleshooting">9. Troubleshooting</h2>
+
+        <h3>Build Fails</h3>
+        <div class="info-box warning">
+            <h4>❌ "error: attribute 'X' missing"</h4>
+            <p><strong>Cause:</strong> Usually means a typo in configuration or missing import.</p>
+            <p><strong>Solution:</strong></p>
+            <ul>
+                <li>Double-check your configuration files for typos</li>
+                <li>Make sure all imported paths exist</li>
+                <li>Run <code>git add .</code> if you created new files</li>
+            </ul>
+        </div>
+
+        <div class="info-box warning">
+            <h4>❌ "hash mismatch in fixed-output derivation"</h4>
+            <p><strong>Cause:</strong> Cached hash doesn't match downloaded file.</p>
+            <p><strong>Solution:</strong></p>
+            <pre><code># Clear the nix store cache
+sudo nix-store --verify --check-contents --repair</code></pre>
+        </div>
+
+        <h3>Hardware Issues</h3>
+        <div class="info-box warning">
+            <h4>🖥️ Display/GPU Not Working</h4>
+            <p><strong>For NVIDIA users:</strong></p>
+            <ul>
+                <li>Make sure <code>../../nixos/nvidia.nix</code> is imported in your configuration.nix</li>
+                <li>Check <code>nixos/nvidia.nix</code> has correct settings for your card</li>
+                <li>Try different NVIDIA driver versions</li>
+            </ul>
+
+            <p><strong>For AMD/Intel users:</strong></p>
+            <ul>
+                <li>Make sure <code>../../nixos/nvidia.nix</code> is NOT imported</li>
+                <li>Open-source drivers should work automatically</li>
+            </ul>
+        </div>
+
+        <div class="info-box warning">
+            <h4>🔊 No Audio</h4>
+            <p><strong>Solution:</strong></p>
+            <pre><code># Check if PulseAudio is running
+systemctl --user status pulseaudio
+
+# Restart PulseAudio
+systemctl --user restart pulseaudio
+
+# Check audio devices
+pactl list sinks</code></pre>
+        </div>
+
+        <div class="info-box warning">
+            <h4>📶 WiFi Not Working</h4>
+            <p><strong>Solution:</strong></p>
+            <pre><code># Check NetworkManager status
+systemctl status NetworkManager
+
+# Restart NetworkManager
+sudo systemctl restart NetworkManager
+
+# Connect via command line
+nmcli device wifi connect "SSID" password "PASSWORD"</code></pre>
+        </div>
+
+        <h3>Hyprland Issues</h3>
+        <div class="info-box warning">
+            <h4>🪟 Hyprland Won't Start</h4>
+            <p><strong>Solution:</strong></p>
+            <ul>
+                <li>Check logs: <code>journalctl --user -u hyprland</code></li>
+                <li>Try starting manually: <code>Hyprland</code></li>
+                <li>Check if SDDM is running: <code>systemctl status sddm</code></li>
+            </ul>
+        </div>
+
+        <h3>Configuration Conflicts</h3>
+        <div class="info-box warning">
+            <h4>⚙️ "infinite recursion" or "value is a set while a list was expected"</h4>
+            <p><strong>Cause:</strong> Configuration error, often in imports or option definitions.</p>
+            <p><strong>Solution:</strong></p>
+            <ul>
+                <li>Check that imports are correctly structured as lists: <code>imports = [ ... ];</code></li>
+                <li>Look for duplicate option definitions</li>
+                <li>Review recent changes with <code>git diff</code></li>
+            </ul>
+        </div>
+
+        <h3>Getting Help</h3>
+        <ul>
+            <li><strong>NixOS Manual:</strong> <a href="https://nixos.org/manual/nixos/stable/" target="_blank">nixos.org/manual</a></li>
+            <li><strong>Home-Manager Manual:</strong> <a href="https://nix-community.github.io/home-manager/" target="_blank">home-manager docs</a></li>
+            <li><strong>Hyprland Wiki:</strong> <a href="https://wiki.hyprland.org/" target="_blank">wiki.hyprland.org</a></li>
+            <li><strong>NixOS Discourse:</strong> <a href="https://discourse.nixos.org/" target="_blank">discourse.nixos.org</a></li>
+            <li><strong>Nixy GitHub Issues:</strong> <a href="https://github.com/anotherhadi/nixy/issues" target="_blank">github.com/anotherhadi/nixy</a></li>
+        </ul>
+
+        <h2 id="advanced">10. Advanced Topics</h2>
+
+        <h3>Multiple Host Management</h3>
+        <p>
+            Nihilix supports managing multiple machines from one repository. Each machine has its own host folder
+            but shares common modules.
+        </p>
+
+        <div class="command-section">
+            <p><strong>Example: Adding a laptop configuration</strong></p>
+            <pre><code># Create new host
+cp -r hosts/nihilix hosts/laptop
+
+# Update variables.nix with laptop-specific settings
+nano hosts/laptop/variables.nix
+
+# Copy laptop's hardware config
+sudo cp /etc/nixos/hardware-configuration.nix hosts/laptop/
+
+# Enable laptop-specific modules in configuration.nix
+nano hosts/laptop/configuration.nix
+# Example: enable power management, disable desktop-only modules
+
+# Register in flake.nix
+nano flake.nix
+# Add laptop = nixpkgs.lib.nixosSystem { ... }
+
+# Build on the laptop
+sudo nixos-rebuild switch --flake ~/.config/nixos#laptop</code></pre>
+        </div>
+
+        <h3>Secrets Management with SOPS</h3>
+        <p>
+            For managing secrets (passwords, API keys, etc.), use SOPS-nix:
+        </p>
+
+        <div class="command-section">
+            <pre><code># Install age for encryption
+nix-shell -p age sops
+
+# Generate age key
+age-keygen -o ~/.config/sops/age/keys.txt
+
+# Create .sops.yaml
+cat > ~/.config/nixos/.sops.yaml << 'EOF'
+keys:
+  - &admin YOUR_AGE_PUBLIC_KEY_HERE
+creation_rules:
+  - path_regex: secrets/.*\.yaml$
+    key_groups:
+      - age:
+          - *admin
+EOF
+
+# Create encrypted secret file
+sops hosts/YOUR-HOST/secrets/secrets.yaml</code></pre>
+
+            <p>See <code>docs/SERVER.md</code> for more details on secrets management.</p>
+        </div>
+
+        <h3>Building Custom Modules</h3>
+        <p>
+            You can create your own modules for programs or services:
+        </p>
+
+        <div class="command-section">
+            <pre><code># Create a new program module
+mkdir -p home/programs/myprogram
+nano home/programs/myprogram/default.nix</code></pre>
+
+            <p>Example module structure:</p>
+            <pre><code>{ config, pkgs, ... }:
+
+{
+  home.packages = with pkgs; [
+    myprogram
+  ];
+
+  # Program-specific configuration
+  home.file.".config/myprogram/config.conf".text = ''
+    option1 = value1
+    option2 = value2
+  '';
+}</code></pre>
+
+            <p>Then import it in your home.nix:</p>
+            <pre><code>imports = [
+  ../../home/programs/myprogram
+];</code></pre>
+        </div>
+
+        <h3>Remote Deployment</h3>
+        <p>
+            You can build and deploy to remote machines:
+        </p>
+
+        <div class="command-section">
+            <pre><code># Build for remote host
+nixos-rebuild switch --flake .#remote-hostname \
+  --target-host user@remote-host \
+  --build-host localhost</code></pre>
+        </div>
+
+        <h3>Impermanence</h3>
+        <p>
+            For advanced users, consider implementing impermanence (stateless root filesystem) for increased security
+            and reproducibility. This requires careful setup and is beyond the scope of this guide, but Nixpkgs has
+            an <code>impermanence</code> module available.
+        </p>
+
+        <h3>Home-Manager Standalone</h3>
+        <p>
+            You can also use Nihilix's home configuration without NixOS (on other Linux distros or macOS):
+        </p>
+
+        <div class="command-section">
+            <pre><code># Install Nix package manager
+sh <(curl -L https://nixos.org/nix/install) --daemon
+
+# Enable flakes
+mkdir -p ~/.config/nix
+echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
+
+# Clone Nihilix
+git clone https://github.com/YOUR-USERNAME/nihilix ~/.config/nixos
+
+# Build home configuration only
+home-manager switch --flake ~/.config/nixos#YOUR-USERNAME@YOUR-HOSTNAME</code></pre>
+
+            <p>Note: This requires modifying flake.nix to export homeConfigurations.</p>
+        </div>
+
+        <h3>Contributing Back</h3>
+        <p>
+            If you make improvements to Nihilix, consider contributing back:
+        </p>
+
+        <div class="command-section">
+            <ol>
+                <li>Fork the repository</li>
+                <li>Create a feature branch: <code>git checkout -b feature/my-improvement</code></li>
+                <li>Make your changes</li>
+                <li>Test thoroughly</li>
+                <li>Commit: <code>git commit -m "feat: add awesome feature"</code></li>
+                <li>Push: <code>git push origin feature/my-improvement</code></li>
+                <li>Open a Pull Request</li>
+            </ol>
+
+            <p>See <code>docs/CONTRIBUTING.md</code> for guidelines.</p>
+        </div>
+
+        <hr style="margin: 40px 0; border: none; border-top: 2px solid var(--border);">
+
+        <h2 style="text-align: center; color: var(--success);">🎉 You're All Set!</h2>
+        <p style="text-align: center; font-size: 1.1em;">
+            Congratulations on setting up Nihilix! You now have a powerful, declarative, and beautiful NixOS system.
+            Enjoy exploring the Hyprland ecosystem and customizing your perfect environment.
+        </p>
+
+        <div class="info-box">
+            <h4>📚 Further Reading</h4>
+            <ul>
+                <li><a href="KEYBINDINGS-HYPRLAND.md">Hyprland Keybindings Reference</a></li>
+                <li><a href="SCRIPTS.md">Available Utility Scripts</a></li>
+                <li><a href="THEMES.md">Theme Customization Guide</a></li>
+                <li><a href="SERVER.md">Server Setup Documentation</a></li>
+                <li><a href="CONTRIBUTING.md">Contributing Guidelines</a></li>
+            </ul>
+        </div>
+
+        <p style="text-align: center; margin-top: 40px; color: var(--text-secondary);">
+            Created with ❤️ for the NixOS and Hyprland communities<br>
+            <small>Guide generated: 2025-10-20</small>
+        </p>
+    </div>
+
+    <a href="#" class="back-to-top" id="backToTop">↑</a>
+
+    <script>
+        // Back to top button functionality
+        const backToTop = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+
+        backToTop.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
