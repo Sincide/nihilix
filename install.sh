@@ -353,6 +353,21 @@ else
     exit 1
 fi
 
+# Extract GRUB device from existing configuration (if it exists)
+echo -e "${BLUE}→ Detecting bootloader configuration...${NC}"
+if [[ "$BOOTLOADER" == "grub" ]] && [[ -f /etc/nixos/configuration.nix ]]; then
+    GRUB_DEVICE=$(grep "boot.loader.grub.device" /etc/nixos/configuration.nix | sed -n 's/.*boot.loader.grub.device = "\([^"]*\)".*/\1/p' | head -1)
+    if [[ -n "$GRUB_DEVICE" ]]; then
+        echo -e "${GREEN}✓ Detected GRUB device: ${GRUB_DEVICE}${NC}\n"
+    else
+        GRUB_DEVICE="nodev"
+        echo -e "${YELLOW}! Could not detect GRUB device, using: nodev${NC}\n"
+    fi
+else
+    GRUB_DEVICE="nodev"
+    echo -e "${GREEN}✓ Using GRUB device: nodev (UEFI mode)${NC}\n"
+fi
+
 # Create variables.nix
 echo -e "${BLUE}→ Creating variables.nix...${NC}"
 
@@ -374,6 +389,7 @@ cat > "${SCRIPT_DIR}/hosts/${HOSTNAME}/variables.nix" << EOF
 
     keyboardLayout = "${KEYBOARD_LAYOUT}";
     consoleKeyMap = "${CONSOLE_KEYMAP}";
+    grubDevice = "${GRUB_DEVICE}"; # GRUB boot device (e.g., /dev/vda, /dev/sda, or nodev for UEFI)
 
     location = "${LOCATION}";
     timeZone = "${TIMEZONE}";
