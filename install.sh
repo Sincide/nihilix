@@ -217,12 +217,14 @@ echo ""
 echo -e "${GREEN}=== Starting Installation ===${NC}\n"
 
 # Check if host already exists
+OVERWRITE_MODE=false
 if [[ -d "${SCRIPT_DIR}/hosts/${HOSTNAME}" ]]; then
     echo -e "${YELLOW}Warning: Host '${HOSTNAME}' already exists!${NC}"
     if ! confirm "Overwrite existing host configuration?" "n"; then
         echo -e "${RED}Installation cancelled.${NC}"
         exit 1
     fi
+    OVERWRITE_MODE=true
     rm -rf "${SCRIPT_DIR}/hosts/${HOSTNAME}"
 fi
 
@@ -366,9 +368,16 @@ echo -e "${GREEN}✓ home.nix copied${NC}\n"
 echo -e "${BLUE}→ Registering host in flake.nix...${NC}"
 
 # Check if host already exists in flake.nix
-if grep -q "      ${HOSTNAME} = nixpkgs.lib.nixosSystem" "${SCRIPT_DIR}/flake.nix" 2>/dev/null; then
+FLAKE_HAS_HOST=false
+if grep -q "${HOSTNAME} = nixpkgs.lib.nixosSystem" "${SCRIPT_DIR}/flake.nix" 2>/dev/null; then
+    FLAKE_HAS_HOST=true
+fi
+
+# Skip only if host exists AND we're not in overwrite mode
+if [[ "$FLAKE_HAS_HOST" == "true" ]] && [[ "$OVERWRITE_MODE" == "false" ]]; then
     echo -e "${YELLOW}Host '${HOSTNAME}' already exists in flake.nix, skipping...${NC}\n"
 else
+    # If we're overwriting and host exists in flake, we need to regenerate the entire flake.nix
     # Create temporary file with the new host entry
     cat > "${SCRIPT_DIR}/flake.nix.tmp" << 'FLAKE_EOF'
 {
@@ -406,12 +415,35 @@ else
     nixosConfigurations = {
 FLAKE_EOF
 
-    # Add all existing hosts from the original flake.nix
+    # Add all existing hosts from the original flake.nix (except the one we're replacing)
     # Extract existing host configurations (everything between nixosConfigurations = { and the closing };)
-    awk '
+    awk -v hostname="${HOSTNAME}" '
         /nixosConfigurations = \{/ { in_configs=1; next }
         in_configs && /^    };$/ { exit }
-        in_configs { print }
+        in_configs {
+            # Check if this line starts a host definition
+            if ($0 ~ /^      [a-zA-Z0-9_-]+ = nixpkgs\.lib\.nixosSystem/) {
+                # Extract hostname from the line
+                match($0, /^      ([a-zA-Z0-9_-]+) =/, arr)
+                current_host = arr[1]
+                # Skip this host if it matches the one we are replacing
+                if (current_host == hostname) {
+                    skip_host = 1
+                    next
+                }
+            }
+            # If we are at the closing brace of a host definition, reset skip flag
+            if ($0 ~ /^      };$/) {
+                if (skip_host) {
+                    skip_host = 0
+                    next
+                }
+            }
+            # Print the line if we are not skipping this host
+            if (!skip_host) {
+                print
+            }
+        }
     ' "${SCRIPT_DIR}/flake.nix" >> "${SCRIPT_DIR}/flake.nix.tmp"
 
     # Add the new host entry
