@@ -17,6 +17,7 @@
       + "/.config/nixos"; # The path of the nixos configuration directory
 
     keyboardLayout = "se";
+    consoleKeyMap = "se-latin1";
 
     location = "Sweden";
     timeZone = "Europe/Stockholm";

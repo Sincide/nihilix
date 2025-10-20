@@ -2,10 +2,15 @@
 {
   pkgs,
   config,
+  lib,
   ...
 }: let
   hostname = config.var.hostname;
   keyboardLayout = config.var.keyboardLayout;
+  consoleKeyMap =
+    if config.var ? consoleKeyMap
+    then config.var.consoleKeyMap
+    else keyboardLayout;
   configDir = config.var.configDirectory;
   timeZone = config.var.timeZone;
   defaultLocale = config.var.defaultLocale;
@@ -51,7 +56,7 @@ in {
       resyncTimer = "10m";
     };
   };
-  console.keyMap = keyboardLayout;
+  console.keyMap = consoleKeyMap;
 
   environment.variables = {
     XDG_DATA_HOME = "$HOME/.local/share";

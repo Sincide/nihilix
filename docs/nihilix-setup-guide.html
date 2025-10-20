@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Nihilix NixOS Setup Guide</title>
+    <style>
+      :root {
+        color-scheme: dark light;
+        font-family: system-ui, sans-serif;
+        line-height: 1.6;
+      }
+      body {
+        margin: 2rem auto;
+        max-width: 72ch;
+        padding: 0 1.5rem 4rem;
+      }
+      h1,
+      h2,
+      h3 {
+        line-height: 1.2;
+      }
+      code {
+        font-family: "Fira Code", "JetBrains Mono", Consolas, monospace;
+        font-size: 0.95em;
+      }
+      pre {
+        background: rgba(0, 0, 0, 0.04);
+        border-radius: 0.4rem;
+        padding: 1rem;
+        overflow-x: auto;
+      }
+      details {
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 0.4rem;
+        padding: 0.75rem 1rem;
+        margin: 1.5rem 0;
+      }
+      details[open] summary {
+        margin-bottom: 0.5rem;
+      }
+      summary {
+        cursor: pointer;
+        font-weight: 600;
+      }
+      a {
+        color: inherit;
+        text-decoration: underline;
+        text-decoration-thickness: 0.1em;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 1.5rem 0;
+      }
+      th,
+      td {
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        padding: 0.6rem;
+        text-align: left;
+      }
+      thead {
+        background: rgba(0, 0, 0, 0.06);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Nihilix NixOS Setup Guide</h1>
+      <p>
+        This document explains how the
+        <code>nihilix</code> fork of the Nixy configuration works, why files are
+        structured the way they are, and how to adapt it to your hardware. Work
+        through it top-to-bottom if you are new to NixOS.
+      </p>
+    </header>
+
+    <section id="big-picture">
+      <h2>1. Big Picture</h2>
+      <p>
+        The repository is a declarative description of an entire desktop
+        environment built around Hyprland. Instead of manually installing
+        packages and editing dotfiles, you keep everything in git and rebuild
+        the system with a single command. The configuration is packaged as a
+        <strong>flake</strong>, which lets you build different machines from the
+        same repo.
+      </p>
+      <ol>
+        <li>
+          <strong>Clone repo</strong> to <code>~/.config/nixos</code> on the target machine.
+        </li>
+        <li>
+          <strong>Select host</strong> (for you this is
+          <code>nihilix</code>).
+        </li>
+        <li>
+          <strong>Update hardware config</strong> with the provided script.
+        </li>
+        <li>
+          <strong>Rebuild</strong> the system with
+          <code>nixos-rebuild switch --flake .#nihilix</code>.
+        </li>
+      </ol>
+    </section>
+
+    <section id="repo-layout">
+      <h2>2. Repository Layout</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Path</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>flake.nix</code></td>
+            <td>
+              Entry point. Lists dependencies (inputs) and the hosts you can
+              build. <code>nihilix</code> is registered here.
+            </td>
+          </tr>
+          <tr>
+            <td><code>hosts/nihilix</code></td>
+            <td>
+              Machine-specific settings: imports, host variables, and the
+              generated hardware description.
+            </td>
+          </tr>
+          <tr>
+            <td><code>home/</code></td>
+            <td>
+              Home Manager modules that configure user applications, scripts,
+              and Hyprland.
+            </td>
+          </tr>
+          <tr>
+            <td><code>nixos/</code></td>
+            <td>
+              System-level modules (audio, bootloader, Hyprland service, etc.)
+              that can be shared by multiple hosts.
+            </td>
+          </tr>
+          <tr>
+            <td><code>themes/</code></td>
+            <td>
+              Stylix-based theme definitions; choose one by importing it in
+              <code>variables.nix</code>.
+            </td>
+          </tr>
+          <tr>
+            <td><code>scripts/update-hardware.sh</code></td>
+            <td>
+              Utility that regenerates <code>hardware-configuration.nix</code>
+              and immediately rebuilds the system.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="flake">
+      <h2>3. Understanding the Flake</h2>
+      <p>
+        In <code>flake.nix</code>, each host is defined under
+        <code>nixosConfigurations</code>. The <code>nihilix</code> entry is the
+        one you will use daily:
+      </p>
+      <pre><code>{
+  nixosConfigurations = {
+    nihilix = nixpkgs.lib.nixosSystem {
+      modules = [
+        { _module.args = { inherit inputs; }; }
+        inputs.home-manager.nixosModules.home-manager
+        inputs.stylix.nixosModules.stylix
+        ./hosts/nihilix/configuration.nix
+      ];
+    };
+  };
+}</code></pre>
+      <ul>
+        <li>
+          <strong><code>inputs</code></strong> are pinned upstream projects (nixpkgs,
+          stylix, home-manager, etc.).
+        </li>
+        <li>
+          The anonymous attribute <code>{ _module.args = { inherit inputs; }; }</code>
+          injects <code>inputs</code> into every module so you can reference them.
+        </li>
+        <li>
+          <strong>Home Manager</strong> and <strong>Stylix</strong> modules are
+          enabled globally for the host.
+        </li>
+        <li>
+          Finally, the host-specific <code>configuration.nix</code> wires everything together.
+        </li>
+      </ul>
+    </section>
+
+    <section id="host-config">
+      <h2>4. Host Folder Anatomy</h2>
+      <p>
+        Your host lives in <code>hosts/nihilix</code>. It contains three important files:
+      </p>
+      <details open>
+        <summary><code>configuration.nix</code></summary>
+        <p>
+          Declares which system modules to use. For the desktop setup we removed
+          laptop-specific files (NVIDIA, Omen). The hardware file and
+          <code>variables.nix</code> are always imported last.
+        </p>
+      </details>
+      <details open>
+        <summary><code>variables.nix</code></summary>
+        <p>
+          Sets host-specific metadata (hostname, username, keyboard layout,
+          locale, git identity). These values flow into both system and Home
+          Manager modules via <code>config.var</code>.
+        </p>
+      </details>
+      <details open>
+        <summary><code>hardware-configuration.nix</code></summary>
+        <p>
+          Generated by <code>nixos-generate-config</code>. It describes disks,
+          filesystems, CPU and firmware quirks. Always replace it with fresh output when
+          you install on new hardware.
+        </p>
+      </details>
+    </section>
+
+    <section id="hyprland">
+      <h2>5. Hyprland Stack</h2>
+      <p>
+        Hyprland is managed entirely through Home Manager modules under
+        <code>home/system/hyprland</code>. Key points of the customised setup:
+      </p>
+      <ul>
+        <li>
+          The keyboard backlight module and touchpad options were removed to
+          match desktop hardware.
+        </li>
+        <li>
+          Monitor configuration now uses a single placeholder entry
+          (<code>,preferred,auto,1</code>), which Hyprland will automatically map
+          to your active monitor.
+        </li>
+        <li>
+          Vulkan-specific environment variables were trimmed so the config does
+          not assume an NVIDIA GPU.
+        </li>
+        <li>
+          Hyprpaper is still started automatically for wallpapers; Nextcloud
+          auto-start was removed.
+        </li>
+      </ul>
+      <p>
+        To customize further, edit the files in
+        <code>home/system/hyprland/</code> or create overlays inside your host's
+        <code>home.nix</code>.
+      </p>
+    </section>
+
+    <section id="packages">
+      <h2>6. User Packages</h2>
+      <p>
+        The package list lives in <code>hosts/nihilix/home.nix</code>. It is
+        split into themed sections (apps, privacy, dev, utils, etc.). Remove or
+        add packages as you like; they will be installed when you rebuild.
+      </p>
+      <p>
+        Example: to add Steam, append <code>steam</code> to the list and rebuild.
+      </p>
+    </section>
+
+    <section id="workflow">
+      <h2>7. Daily Workflow</h2>
+      <ol>
+        <li>
+          Clone repo to <code>~/.config/nixos</code> on the machine.
+        </li>
+        <li>
+          Update configs (packages, monitors, secrets) as needed.
+        </li>
+        <li>
+          Run <code>./scripts/update-hardware.sh nihilix</code> in the VM or machine.
+          The script will:
+          <ul>
+            <li>Generate a fresh <code>hardware-configuration.nix</code>.</li>
+            <li>Overwrite the host file.</li>
+            <li>Call <code>sudo nixos-rebuild switch --flake .#nihilix</code>.</li>
+          </ul>
+        </li>
+        <li>
+          Log in and enjoy the configured desktop.
+        </li>
+      </ol>
+      <p>
+        The script accepts an optional path if you already ran
+        <code>nixos-generate-config</code> manually:
+      </p>
+      <pre><code>./scripts/update-hardware.sh nihilix /tmp/hardware-configuration.nix</code></pre>
+    </section>
+
+    <section id="troubleshooting">
+      <h2>8. Troubleshooting Tips</h2>
+      <ul>
+        <li>
+          <strong>Flake fails to evaluate</strong>: Ensure the host name in
+          <code>flake.nix</code> matches the folder under <code>hosts/</code>.
+        </li>
+        <li>
+          <strong>Missing packages</strong>: They may live in separate modules
+          under <code>home/programs/</code>. Import them in
+          <code>hosts/nihilix/home.nix</code>.
+        </li>
+        <li>
+          <strong>Display issues</strong>: Fine-tune the
+          <code>monitor</code> entries in
+          <code>home/system/hyprland/default.nix</code>.
+        </li>
+        <li>
+          <strong>Audio problems</strong>: Check <code>nixos/audio.nix</code>, which
+          enables PipeWire and related services.
+        </li>
+        <li>
+          <strong>Secrets</strong>: The original repo uses SOPS, but your host
+          omits it. Re-enable by copying <code>hosts/laptop/secrets</code> if you need it later.
+        </li>
+      </ul>
+    </section>
+
+    <section id="glossary">
+      <h2>9. Glossary</h2>
+      <dl>
+        <dt>Flake</dt>
+        <dd>
+          A Nix packaging format that pins dependencies and exposes outputs such
+          as NixOS configurations.
+        </dd>
+        <dt>Module</dt>
+        <dd>
+          Reusable configuration snippet. NixOS modules target system settings;
+          Home Manager modules configure user environments.
+        </dd>
+        <dt>Hyprland</dt>
+        <dd>
+          A dynamic tiling Wayland compositor powering the desktop experience in
+          this setup.
+        </dd>
+        <dt>Stylix</dt>
+        <dd>
+          Theming layer that synchronizes colors, fonts, cursors, and more
+          across applications.
+        </dd>
+        <dt>Home Manager</dt>
+        <dd>
+          Nix tool for managing user-level configuration and dotfiles.
+        </dd>
+        <dt>hardware-configuration.nix</dt>
+        <dd>
+          Generated file describing disks, filesystems, firmware. Must match the
+          target machine.
+        </dd>
+      </dl>
+    </section>
+
+    <section id="next">
+      <h2>10. What to Explore Next</h2>
+      <ul>
+        <li>
+          Create your own theme by copying a file from <code>themes/</code> and
+          importing it in <code>variables.nix</code>.
+        </li>
+        <li>
+          Add new services by importing modules under <code>nixos/</code> or
+          writing your own.
+        </li>
+        <li>
+          Review the docs in <code>docs/</code> (scripts, keybindings, themes)
+          for specific components.
+        </li>
+        <li>
+          Consider setting up SOPS once you need secrets (SSH keys, VPN files).
+        </li>
+      </ul>
+    </section>
+  </body>
+</html>
