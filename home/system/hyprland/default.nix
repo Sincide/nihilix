@@ -19,7 +19,6 @@ in {
     ./animations.nix
     ./bindings.nix
     ./polkitagent.nix
-    ./keyboard-backlight.nix # CHANGEME: This is for omen laptop only
   ];
 
   home.packages = with pkgs; [
@@ -34,7 +33,6 @@ in {
     wf-recorder
     wlr-randr
     wl-clipboard
-    brightnessctl
     gnome-themes-extra
     libva
     dconf
@@ -64,14 +62,10 @@ in {
       exec-once = [
         "dbus-update-activation-environment --systemd --all &"
         "systemctl --user enable --now hyprpaper.service &"
-        "systemctl --user enable --now nextcloud-client.service  &"
       ];
 
       monitor = [
-        "eDP-2,highres,0x0,1" # My internal laptop screen
-        "desc:AOC U34G2G1 0x00000E06,3440x1440@99.98,auto,1" # My external monitor
-        "desc:United Microelectr Corporation UMC SHARP,3840x2160,auto,2" # TV
-        ",prefered,auto,1" # default
+        ",preferred,auto,1"
       ];
 
       env = [
@@ -91,12 +85,8 @@ in {
         "DISABLE_QT5_COMPAT,0"
         "DIRENV_LOG_FORMAT,"
         "WLR_DRM_NO_ATOMIC,1"
-        "WLR_BACKEND,vulkan"
-        "WLR_RENDERER,vulkan"
-        "WLR_NO_HARDWARE_CURSORS,1"
         "SDL_VIDEODRIVER,wayland"
         "CLUTTER_BACKEND,wayland"
-        "AQ_DRM_DEVICES,/dev/dri/card2:/dev/dri/card1" # CHANGEME: Related to the GPU
       ];
 
       cursor = {
@@ -191,11 +181,6 @@ in {
         repeat_delay = 300;
         repeat_rate = 50;
         numlock_by_default = true;
-
-        touchpad = {
-          natural_scroll = true;
-          clickfinger_behavior = true;
-        };
       };
     };
   };
