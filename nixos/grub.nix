@@ -1,20 +1,22 @@
-# GRUB bootloader configuration for systems where systemd-boot is unavailable.
-{pkgs, lib, ...}: {
+# GRUB bootloader configuration for NixOS
+{pkgs, ...}: {
   boot = {
     bootspec.enable = true;
     loader = {
-      efi.canTouchEfiVariables = lib.mkDefault true;
-      systemd-boot.enable = lib.mkDefault false;
+      efi.canTouchEfiVariables = true;
       grub = {
         enable = true;
-        efiSupport = true;
-        useOSProber = false;
         device = "nodev";
+        efiSupport = true;
+        useOSProber = true;
         configurationLimit = 8;
       };
     };
     tmp.cleanOnBoot = true;
-    kernelPackages = pkgs.linuxPackages_latest;
+    kernelPackages =
+      pkgs.linuxPackages_latest; # _zen, _hardened, _rt, _rt_latest, etc.
+
+    # Silent boot
     kernelParams = [
       "quiet"
       "splash"
@@ -27,5 +29,6 @@
     initrd.verbose = false;
   };
 
-  systemd.settings.Manager = {DefaultTimeoutStopSec = "10s";};
+  # To avoid systemd services hanging on shutdown
+  systemd.settings.Manager = { DefaultTimeoutStopSec = "10s"; };
 }

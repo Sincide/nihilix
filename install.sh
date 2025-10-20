@@ -231,6 +231,53 @@ ENABLE_DOCKER=false
 ENABLE_TAILSCALE=false
 ENABLE_BLUETOOTH=false
 
+# Detect bootloader
+echo -e "${BLUE}Detecting bootloader...${NC}"
+if [[ -d /boot/grub ]]; then
+    DETECTED_BOOTLOADER="grub"
+    echo -e "${GREEN}→ Detected GRUB bootloader${NC}"
+elif [[ -d /boot/loader ]]; then
+    DETECTED_BOOTLOADER="systemd-boot"
+    echo -e "${GREEN}→ Detected systemd-boot bootloader${NC}"
+else
+    DETECTED_BOOTLOADER="unknown"
+    echo -e "${YELLOW}→ Could not detect bootloader${NC}"
+fi
+
+echo ""
+echo -e "${CYAN}Bootloader options:${NC}"
+echo "  1) Use detected bootloader (${DETECTED_BOOTLOADER})"
+echo "  2) GRUB (recommended for compatibility)"
+echo "  3) systemd-boot (faster, simpler)"
+echo ""
+
+BOOTLOADER_CHOICE=$(prompt "Select bootloader [1-3]" "1")
+
+case "$BOOTLOADER_CHOICE" in
+    1)
+        if [[ "$DETECTED_BOOTLOADER" == "unknown" ]]; then
+            echo -e "${YELLOW}No bootloader detected, defaulting to GRUB${NC}"
+            BOOTLOADER="grub"
+        else
+            BOOTLOADER="$DETECTED_BOOTLOADER"
+        fi
+        ;;
+    2)
+        BOOTLOADER="grub"
+        ;;
+    3)
+        BOOTLOADER="systemd-boot"
+        ;;
+    *)
+        BOOTLOADER="$DETECTED_BOOTLOADER"
+        if [[ "$BOOTLOADER" == "unknown" ]]; then
+            BOOTLOADER="grub"
+        fi
+        ;;
+esac
+
+echo -e "${GREEN}→ Using bootloader: ${BOOTLOADER}${NC}\n"
+
 if confirm "Do you have an NVIDIA GPU?" "n"; then
     ENABLE_NVIDIA=true
 fi
@@ -260,6 +307,7 @@ echo -e "${CYAN}Default Locale:${NC}  ${YELLOW}${DEFAULT_LOCALE}${NC}"
 echo -e "${CYAN}Git Username:${NC}    ${YELLOW}${GIT_USERNAME}${NC}"
 echo -e "${CYAN}Git Email:${NC}       ${YELLOW}${GIT_EMAIL}${NC}"
 echo -e "${CYAN}Theme:${NC}           ${YELLOW}${THEME}${NC}"
+echo -e "${CYAN}Bootloader:${NC}      ${YELLOW}${BOOTLOADER}${NC}"
 echo -e "${CYAN}Auto Upgrade:${NC}    ${YELLOW}${AUTO_UPGRADE}${NC}"
 echo -e "${CYAN}Auto GC:${NC}         ${YELLOW}${AUTO_GC}${NC}"
 echo ""
@@ -381,6 +429,13 @@ else
     echo "    # ../../nixos/bluetooth.nix  # Disabled" >> "${SCRIPT_DIR}/hosts/${HOSTNAME}/configuration.nix"
 fi
 
+# Add the selected bootloader
+if [[ "$BOOTLOADER" == "grub" ]]; then
+    echo "    ../../nixos/grub.nix" >> "${SCRIPT_DIR}/hosts/${HOSTNAME}/configuration.nix"
+else
+    echo "    ../../nixos/systemd-boot.nix" >> "${SCRIPT_DIR}/hosts/${HOSTNAME}/configuration.nix"
+fi
+
 if [[ "$ENABLE_NVIDIA" == "true" ]]; then
     echo "    ../../nixos/nvidia.nix" >> "${SCRIPT_DIR}/hosts/${HOSTNAME}/configuration.nix"
 else
@@ -403,7 +458,6 @@ cat >> "${SCRIPT_DIR}/hosts/${HOSTNAME}/configuration.nix" << EOF
     ../../nixos/fonts.nix
     ../../nixos/home-manager.nix
     ../../nixos/nix.nix
-    ../../nixos/systemd-boot.nix
     ../../nixos/sddm.nix
     ../../nixos/users.nix
     ../../nixos/utils.nix
