@@ -5,14 +5,23 @@
   # Detect if system is using UEFI or BIOS
   isUefi = builtins.pathExists /sys/firmware/efi;
 
-  # For BIOS mode, try to detect the boot disk from hardware-configuration
-  # Common devices: /dev/vda (VMs), /dev/sda (SATA), /dev/nvme0n1 (NVMe)
-  # If detection fails, default to /dev/vda (works for VMs)
-  biosBootDevice =
-    if builtins.pathExists /dev/vda then "/dev/vda"
-    else if builtins.pathExists /dev/sda then "/dev/sda"
-    else if builtins.pathExists /dev/nvme0n1 then "/dev/nvme0n1"
+  # For BIOS mode, detect boot device from root filesystem device
+  # Extract the disk device from the root filesystem configuration
+  rootDevice =
+    if config.fileSystems."/".device != null
+    then
+      let
+        device = config.fileSystems."/".device;
+        # Extract base device:
+        # /dev/vda1 -> /dev/vda
+        # /dev/sda1 -> /dev/sda
+        # /dev/nvme0n1p1 -> /dev/nvme0n1
+        # Remove partition indicators (p1, p2, or just 1, 2, etc.)
+        baseDevice = builtins.head (builtins.match "(/dev/[a-z0-9]+)(p?[0-9]+)?" device);
+      in baseDevice
     else "/dev/sda"; # fallback
+
+  biosBootDevice = if isUefi then "nodev" else rootDevice;
 in {
   boot = {
     bootspec.enable = true;
@@ -20,8 +29,8 @@ in {
       efi.canTouchEfiVariables = lib.mkIf isUefi true;
       grub = {
         enable = true;
-        # For UEFI: device = "nodev", for BIOS: auto-detect boot disk
-        device = if isUefi then "nodev" else biosBootDevice;
+        # For UEFI: device = "nodev", for BIOS: auto-detect boot disk from root filesystem
+        device = biosBootDevice;
         efiSupport = isUefi;
         useOSProber = true;
         configurationLimit = 8;
