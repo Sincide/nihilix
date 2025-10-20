@@ -118,7 +118,59 @@ LOCATION=$(prompt "Location (e.g., Sweden, USA)" "Sweden")
 echo ""
 echo -e "${MAGENTA}=== Localization ===${NC}\n"
 
-KEYBOARD=$(prompt "Keyboard layout (e.g., us, se, de, fr)" "us")
+# Ask for keyboard layout with better guidance
+echo -e "${CYAN}Common keyboard layouts:${NC}"
+echo "  us (US English)"
+echo "  uk (UK English)"
+echo "  se (Swedish)"
+echo "  sv (Swedish - alternative)"
+echo "  de (German)"
+echo "  fr (French)"
+echo "  es (Spanish)"
+echo "  no (Norwegian)"
+echo "  dk (Danish)"
+echo ""
+
+KEYBOARD_INPUT=$(prompt "Keyboard layout" "us")
+
+# Map common inputs to correct console keyboard names
+# NixOS console uses different names than X11/Wayland
+case "$KEYBOARD_INPUT" in
+    se|sv|swedish)
+        KEYBOARD="sv-latin1"
+        ;;
+    us|en)
+        KEYBOARD="us"
+        ;;
+    uk)
+        KEYBOARD="uk"
+        ;;
+    de|german)
+        KEYBOARD="de-latin1"
+        ;;
+    fr|french)
+        KEYBOARD="fr-latin1"
+        ;;
+    es|spanish)
+        KEYBOARD="es"
+        ;;
+    no|norwegian)
+        KEYBOARD="no-latin1"
+        ;;
+    dk|danish)
+        KEYBOARD="dk-latin1"
+        ;;
+    fi|finnish)
+        KEYBOARD="fi"
+        ;;
+    *)
+        # Use as-is for other layouts
+        KEYBOARD="$KEYBOARD_INPUT"
+        ;;
+esac
+
+echo -e "${GREEN}→ Using keyboard layout: ${KEYBOARD}${NC}\n"
+
 DEFAULT_LOCALE=$(prompt "Default locale" "en_US.UTF-8")
 EXTRA_LOCALE=$(prompt "Extra locale (press Enter to skip, or enter locale like sv_SE.UTF-8)" "" "true")
 
