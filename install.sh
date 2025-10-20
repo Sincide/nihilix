@@ -133,43 +133,54 @@ echo ""
 
 KEYBOARD_INPUT=$(prompt "Keyboard layout" "us")
 
-# Map common inputs to correct console keyboard names
-# NixOS console uses different names than X11/Wayland
+# NixOS needs TWO keyboard layout values:
+# 1. keyboardLayout - for X11/Wayland/Hyprland
+# 2. consoleKeyMap - for console (different naming)
 case "$KEYBOARD_INPUT" in
     se|sv|swedish)
-        KEYBOARD="sv-latin1"
+        KEYBOARD_LAYOUT="se"
+        CONSOLE_KEYMAP="sv-latin1"
         ;;
     us|en)
-        KEYBOARD="us"
+        KEYBOARD_LAYOUT="us"
+        CONSOLE_KEYMAP="us"
         ;;
     uk)
-        KEYBOARD="uk"
+        KEYBOARD_LAYOUT="uk"
+        CONSOLE_KEYMAP="uk"
         ;;
     de|german)
-        KEYBOARD="de-latin1"
+        KEYBOARD_LAYOUT="de"
+        CONSOLE_KEYMAP="de-latin1"
         ;;
     fr|french)
-        KEYBOARD="fr-latin1"
+        KEYBOARD_LAYOUT="fr"
+        CONSOLE_KEYMAP="fr-latin1"
         ;;
     es|spanish)
-        KEYBOARD="es"
+        KEYBOARD_LAYOUT="es"
+        CONSOLE_KEYMAP="es"
         ;;
     no|norwegian)
-        KEYBOARD="no-latin1"
+        KEYBOARD_LAYOUT="no"
+        CONSOLE_KEYMAP="no-latin1"
         ;;
     dk|danish)
-        KEYBOARD="dk-latin1"
+        KEYBOARD_LAYOUT="dk"
+        CONSOLE_KEYMAP="dk-latin1"
         ;;
     fi|finnish)
-        KEYBOARD="fi"
+        KEYBOARD_LAYOUT="fi"
+        CONSOLE_KEYMAP="fi"
         ;;
     *)
-        # Use as-is for other layouts
-        KEYBOARD="$KEYBOARD_INPUT"
+        # Use as-is for other layouts (same for both)
+        KEYBOARD_LAYOUT="$KEYBOARD_INPUT"
+        CONSOLE_KEYMAP="$KEYBOARD_INPUT"
         ;;
 esac
 
-echo -e "${GREEN}→ Using keyboard layout: ${KEYBOARD}${NC}\n"
+echo -e "${GREEN}→ Keyboard: ${KEYBOARD_LAYOUT} (graphical), ${CONSOLE_KEYMAP} (console)${NC}\n"
 
 DEFAULT_LOCALE=$(prompt "Default locale" "en_US.UTF-8")
 EXTRA_LOCALE=$(prompt "Extra locale (press Enter to skip, or enter locale like sv_SE.UTF-8)" "" "true")
@@ -243,7 +254,7 @@ echo -e "${CYAN}Hostname:${NC}        ${YELLOW}${HOSTNAME}${NC}"
 echo -e "${CYAN}Username:${NC}        ${YELLOW}${USERNAME}${NC}"
 echo -e "${CYAN}Timezone:${NC}        ${YELLOW}${TIMEZONE}${NC}"
 echo -e "${CYAN}Location:${NC}        ${YELLOW}${LOCATION}${NC}"
-echo -e "${CYAN}Keyboard:${NC}        ${YELLOW}${KEYBOARD}${NC}"
+echo -e "${CYAN}Keyboard:${NC}        ${YELLOW}${KEYBOARD_LAYOUT}${NC} (graphical), ${YELLOW}${CONSOLE_KEYMAP}${NC} (console)"
 echo -e "${CYAN}Default Locale:${NC}  ${YELLOW}${DEFAULT_LOCALE}${NC}"
 [[ -n "$EXTRA_LOCALE" ]] && echo -e "${CYAN}Extra Locale:${NC}    ${YELLOW}${EXTRA_LOCALE}${NC}"
 echo -e "${CYAN}Git Username:${NC}    ${YELLOW}${GIT_USERNAME}${NC}"
@@ -313,7 +324,8 @@ cat > "${SCRIPT_DIR}/hosts/${HOSTNAME}/variables.nix" << EOF
     username = "${USERNAME}";
     configDirectory = "${SCRIPT_DIR}"; # The path of the nixos configuration directory
 
-    keyboardLayout = "${KEYBOARD}";
+    keyboardLayout = "${KEYBOARD_LAYOUT}";
+    consoleKeyMap = "${CONSOLE_KEYMAP}";
 
     location = "${LOCATION}";
     timeZone = "${TIMEZONE}";
