@@ -54,11 +54,15 @@ echo -e "${GREEN}✓ Running on NixOS${NC}\n"
 prompt() {
     local prompt_text="$1"
     local default_value="$2"
+    local optional="${3:-false}"
     local result
 
     if [[ -n "$default_value" ]]; then
         read -p "$(echo -e ${CYAN}${prompt_text}${NC} [${YELLOW}${default_value}${NC}]: )" result
         echo "${result:-$default_value}"
+    elif [[ "$optional" == "true" ]]; then
+        read -p "$(echo -e ${CYAN}${prompt_text}${NC}: )" result
+        echo "$result"
     else
         read -p "$(echo -e ${CYAN}${prompt_text}${NC}: )" result
         while [[ -z "$result" ]]; do
@@ -116,7 +120,7 @@ echo -e "${MAGENTA}=== Localization ===${NC}\n"
 
 KEYBOARD=$(prompt "Keyboard layout (e.g., us, se, de, fr)" "us")
 DEFAULT_LOCALE=$(prompt "Default locale" "en_US.UTF-8")
-EXTRA_LOCALE=$(prompt "Extra locale (optional, press Enter to skip)" "")
+EXTRA_LOCALE=$(prompt "Extra locale (press Enter to skip, or enter locale like sv_SE.UTF-8)" "" "true")
 
 echo ""
 echo -e "${MAGENTA}=== Git Configuration ===${NC}\n"
